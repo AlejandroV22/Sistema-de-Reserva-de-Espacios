@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel de Residente - TeamWare{% endblock %}
+
+{% block content %}
+    <h2 class="display-6 fw-bolder mb-3 text-purple-dark d-flex align-items-center">
+        ¡Bienvenido Residente! <span class="ms-3 display-4 display-md-3">👋</span>
+    </h2>
+    <p class="text-secondary mb-4">Aquí puedes gestionar tus espacios, hacer reservas y más.</p> 
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">   
+        <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                <img class="card-img-top" src="{% static 'imagenes/La-Pradera-Salon-Social-1.jpg' %}" alt="Reserva de Sala de Juntas" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Salón Social</h4>
+                    <p class="card-text text-secondary mb-3 small">Agenda tu espacio ideal para reuniones y colaboraciones profesionales.</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>  
+
+        <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                <img class="card-img-top" src="{% static 'imagenes/gimnasio.jpg' %}" alt="Acceso al Gimnasio" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Gimnasio </h4>
+                    <p class="card-text text-secondary mb-3 small">Mantente en forma con acceso ilimitado a nuestras modernas instalaciones.</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div> 
+
+        <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                <img class="card-img-top" src="{% static 'imagenes/cine.jpg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Sala de Cine</h4>
+                    <p class="card-text text-secondary mb-3 small">Disfruta del mejor cine sin salir de casa, en un espacio cómodo y exclusivo para residentes</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+                             
+        <div class="col"> 
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                <img class="card-img-top" src="{% static 'imagenes/piscina.jpg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Piscina</h4>
+                    <p class="card-text text-secondary mb-3 small">Relájate y refréscate en nuestra piscina, el oasis perfecto para escapar del calor.</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col">  
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                <img class="card-img-top" src="{% static 'imagenes/sauna.jpg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Sauna</h4>
+                    <p class="card-text text-secondary mb-3 small">Disfruta del calor reconfortante de nuestro sauna para una experiencia de renovación total.</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect"> 
+                <img class="card-img-top" src="{% static 'imagenes/turco.jpeg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Turco</h4>
+                    <p class="card-text text-secondary mb-3 small">Purifica tu cuerpo y relaja tu mente en la atmósfera de vapor de nuestro baño turco.</p>
+                    <button class="btn btn-purple-dark w-100 py-2">
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

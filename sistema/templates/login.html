@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamWare - Iniciar Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    {# Cargar la etiqueta 'static' para enlazar el CSS y la imagen del logo #}
+    {% load static %} 
+
+    <link rel="stylesheet" href="{% static 'css/style_login.css' %}"> 
+
+   
+</head>
+<body>
+    <div class="left-panel">
+        <div class="card p-5 shadow-lg text-center login-card">
+            {# La imagen del logo sigue usando {% static %} directamente aquí #}
+            <img src="{% static 'imagenes/Preview.png' %}" alt="Logo de la empresa" class="img-fluid mx-auto mb-4" style="height: 120px; width: auto;">
+            <h2 class="h3 fw-semibold text-center mb-4 text-secondary">Iniciar sesión</h2> 
+
+            <form class="w-100">
+                <div class="mb-3">
+                    <label for="username" class="form-label text-secondary">Usuario*</label>
+                    <input type="text" class="form-control form-control-custom" id="username">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label text-secondary">Contraseña*</label>
+                    <input type="password" class="form-control form-control-custom" id="password">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-custom-primary text-white py-2">
+                        Inicio Sesión
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="right-panel">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

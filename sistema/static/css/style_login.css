@@ -1,0 +1,57 @@
+/* Estilos personalizados para la vista de login */
+body {
+    height: 100vh;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+/* Para que los paneles ocupen el 50% del ancho y se ajusten con flexbox */
+.left-panel, .right-panel {
+    flex: 1; /* Esto hace que ambos tomen el mismo espacio disponible */
+    width: 50%; /* Asegura que cada uno inicialmente ocupe la mitad */
+}
+.left-panel {
+    background-color: #021f3c; /* bg-[#021f3c] */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-card {
+    width: 500px; /* w-[500px] */
+    max-width: 90%; /* Hace que sea responsivo en pantallas más pequeñas */
+}
+.form-control-custom {
+    background-color: #e2e8f0; /* bg-gray-300 */
+}
+.btn-custom-primary {
+    background-color: #021f3c; /* bg-[#021f3c] */
+    border-color: #021f3c;
+    color: white; /* Asegura que el texto sea blanco */
+}
+.btn-custom-primary:hover {
+    background-color: #03315f; /* hover:bg-[#03315f] */
+    border-color: #03315f;
+}
+.right-panel {
+    /* ¡MUY IMPORTANTE AQUÍ! La ruta DEBE ser /static/ o relativa */
+    /* Si STATIC_URL es '/static/', esta es la forma correcta */
+    background-image: url('/static/imagenes/park-5131224_1280.jpg'); 
+    background-size: cover;
+    background-position: center;
+}
+
+/* Media queries para pantallas más pequeñas (movil/tablet) */
+@media (max-width: 767.98px) { /* Bootstrap 'md' breakpoint */
+    body {
+        flex-direction: column; /* Apila los paneles verticalmente */
+    }
+    .left-panel, .right-panel {
+        width: 100%; /* Cada panel ocupa el ancho completo */
+        height: 50vh; /* Cada panel ocupa la mitad de la altura de la vista */
+    }
+    .login-card {
+        width: auto; /* Permite que el card se ajuste al padding */
+        margin: 0 15px; /* Pequeño margen para que no toque los bordes */
+    }
+}
