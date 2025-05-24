@@ -158,6 +158,39 @@
                 </div>
             </div>
         </div>
+
+         <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect"> 
+                <img class="card-img-top" src="{% static 'imagenes/cancha.jpg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Cancha Sintética</h4>
+                    <p class="card-text text-secondary mb-3 small">Tu espacio perfecto para el deporte: nuestra cancha sintética te espera para tus mejores jugadas y entrenamientos.</p>
+                    <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
+                            data-bs-toggle="modal" data-bs-target="#reservaModal"
+                            data-espacio-id="6"        {# ID del espacio #}
+                            data-espacio-nombre="Turco"> {# Nombre del espacio #}
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+         <div class="col">
+            <div class="card h-100 shadow-sm overflow-hidden card-hover-effect"> 
+                <img class="card-img-top" src="{% static 'imagenes/bbq.jpg' %}" alt="Soporte Técnico" style="height: 192px; object-fit: cover;">
+                <div class="card-body">
+                    <h4 class="card-title h5 fw-semibold text-dark mb-2">Zona BBQ</h4>
+                    <p class="card-text text-secondary mb-3 small">"El sabor de tus reuniones se eleva en nuestra Zona BBQ. Reserva tu espacio y enciende la parrilla.</p>
+                    <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
+                            data-bs-toggle="modal" data-bs-target="#reservaModal"
+                            data-espacio-id="6"        {# ID del espacio #}
+                            data-espacio-nombre="Turco"> {# Nombre del espacio #}
+                        Reservar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal fade" id="reservaModal" tabindex="-1" aria-labelledby="reservaModalLabel" aria-hidden="true">
