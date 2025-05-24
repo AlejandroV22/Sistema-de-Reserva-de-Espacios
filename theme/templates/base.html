@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}TeamWare App{% endblock title %}</title>
+
+    {# Carga las etiquetas de django-tailwind #}
+    {% load tailwind_tags %} 
+    {# Carga las etiquetas para archivos estáticos de Django #}
+    {% load static %}       
+    
+    {# Incluye el CSS compilado de Tailwind (reemplaza la CDN) #}
+    {% tailwind_css %}      
+    
+    {# Carga tu CSS personalizado, si es necesario para la base #}
+    {# Si tienes estilos CSS que aplican a toda la base, ponlos aquí. Por ahora, no lo necesitamos para el fondo #}
+    {# <link rel="stylesheet" href="{% static 'css/base_custom.css' %}"> #}
+</head>
+<body class="bg-[#20084B] min-h-screen flex flex-col"> {# Fondo azul oscuro para todo el body #}
+
+    {# 1. BARRA DE NAVEGACIÓN (NAVBAR) - Extraída directamente de tu usuario.html #}
+    <nav class="bg-[#D9D9D9] text-black px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-6"> 
+            <a href="#" class="hover:underline">Reservas</a>
+        </div>
+        {# Este es el texto que aparece en la barra de navegación #}
+        <h1 class="text-xl font-bold">Panel del Usuario</h1> 
+        {# Aquí puedes añadir más elementos a la derecha, como un enlace de perfil o logout #}
+    </nav>
+
+    {# 2. CONTENEDOR PRINCIPAL DEL CONTENIDO (Fondo blanco encima del azul) #}
+    {# flex-grow para que ocupe el espacio restante, flex items-center justify-center para centrar el contenido #}
+    <main class="flex-grow flex items-center justify-center p-6">
+        {# Este div blanco será el que contenga el contenido específico de cada página #}
+        {# min-h-[calc(100vh-8rem)] para que tenga una altura mínima calculada para el espacio disponible #}
+        <div class="bg-white w-full max-w-6xl min-h-[calc(100vh-8rem)] rounded-lg shadow-md p-10 flex flex-col"> 
+            {# Bloque donde se insertará el contenido específico de las páginas hijas #}
+            {% block content %}
+                {# El contenido de las páginas hijas irá aquí #}
+            {% endblock content %}
+        </div>
+    </main>
+
+    {# Puedes añadir un footer común aquí si lo necesitas #}
+    {# <footer class="bg-gray-800 text-white text-center py-3">
+        <p>&copy; 2025 Tu Empresa. Todos los derechos reservados.</p>
+    </footer> #}
+
+    {# Scripts JS globales si los hay #}
+</body>
+</html>
