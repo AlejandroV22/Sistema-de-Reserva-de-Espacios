@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Administrar Usuarios</title>
+</head>
+<body>
+    <h1>Lista de Usuarios</h1>
+
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Correo</th>
+            <th>Rol</th>
+        </tr>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.username }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.rol }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{% url 'admin_panel_espacios' %}">Volver a Espacios</a>
+</body>
+</html>
