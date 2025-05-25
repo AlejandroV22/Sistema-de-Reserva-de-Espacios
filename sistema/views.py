@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Espacio, Usuario, Reserva , HorarioDisponible
+from .models import Espacio, Usuario, Reserva , HorarioDisponible, Sancion
 from .forms import EspacioForm 
 from django.http import JsonResponse
 from datetime import datetime, timedelta
@@ -12,6 +12,7 @@ from django.conf import settings
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from .forms import SancionForm
 # Create your views here.
 @require_POST
 
@@ -261,3 +262,26 @@ def confirmar_reserva(request):
             return JsonResponse({'success': False, 'message': f'Error inesperado del servidor: {str(e)}'}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+    
+
+def aplicar_sancion(request):
+    if request.method == 'POST':
+        form = SancionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_sanciones')  # o donde prefieras
+    else:
+        form = SancionForm()
+    return render(request, 'aplicar_sancion.html', {'form': form})
+
+def ver_sanciones(request):
+    sanciones = Sancion.objects.select_related('usuario').all()
+    return render(request, 'ver_sanciones.html', {'sanciones': sanciones})
+
+@property
+def esta_activa(self):
+    if self.fecha_levantamiento is None:
+        return True
+    return self.fecha_levantamiento > timezone.now()
+

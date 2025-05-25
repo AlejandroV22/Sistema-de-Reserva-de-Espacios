@@ -1,5 +1,6 @@
 from django import forms
-from .models import Espacio, Reserva
+from .models import Sancion, Usuario, Reserva, Espacio
+
 
 class EspacioForm(forms.ModelForm):
     class Meta:
@@ -24,6 +25,14 @@ class ReservaForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = ['fecha_Reserva', 'horaInicio', 'horaFin']
+
+class SancionForm(forms.ModelForm):
+    class Meta:
+        model = Sancion
+        fields = ['usuario', 'motivo', 'fecha_levantamiento']
+        widgets = {
+            'fecha_levantamiento': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
 
 
 

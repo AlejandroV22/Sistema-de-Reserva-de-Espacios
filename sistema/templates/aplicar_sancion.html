@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aplicar Sanción</title>
+</head>
+<body>
+    <h1>Aplicar Sanción</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Aplicar Sanción</button>
+    </form>
+
+    <a href="{% url 'panel_administrador' %}">← Volver al panel</a>
+</body>
+</html>

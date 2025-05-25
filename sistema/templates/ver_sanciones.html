@@ -1,0 +1,32 @@
+<h2>Listado de Sanciones</h2>
+
+<table>
+    <tr>
+        <th>Usuario</th>
+        <th>Motivo</th>
+        <th>Aplicación</th>
+        <th>Levantamiento</th>
+        <th>Estado</th>
+    </tr>
+    {% for sancion in sanciones %}
+    <tr>
+        <td>{{ sancion.usuario.username }}</td>
+        <td>{{ sancion.motivo }}</td>
+        <td>{{ sancion.fecha_aplicacion }}</td>
+        <td>
+            {% if sancion.fecha_levantamiento %}
+                {{ sancion.fecha_levantamiento }}
+            {% else %}
+                Indefinida
+            {% endif %}
+        </td>
+        <td>
+            {% if sancion.esta_activa %}
+                Activa
+            {% else %}
+                Inactiva
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
