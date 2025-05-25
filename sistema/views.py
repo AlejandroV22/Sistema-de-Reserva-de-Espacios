@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib import messages
 # Create your views here.
 
 
@@ -70,9 +71,74 @@ def panel_administrador(request): #Panel de administrador personalizado
 def panel_usuarios(request): #Administracion de usuarios 
     return render(request, 'panel_usuarios.html')  
 
+
 def admin_panel_usuarios(request):
     usuarios = Usuario.objects.all()
+
+    # Agregar usuario
+    if 'add_Usuario' in request.POST:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        is_staff = request.POST.get('is_staff') == 'True'
+
+        if username and password:
+            if Usuario.objects.filter(username=username).exists():
+                messages.error(request, "El nombre de usuario ya está registrado. Por favor, elige otro.")
+                return redirect('administrar_usuarios')
+
+            usuario = Usuario.objects.create_user(username=username, password=password, email=email)
+            usuario.first_name = first_name
+            usuario.last_name = last_name
+            usuario.is_staff = is_staff
+            messages.success(request, f"{usuario.username} agregado correctamente.")
+            usuario.save()
+
+        return redirect('admin_panel_usuarios')
+                
+    # Eliminar usuario
+    if 'delete_Usuario' in request.POST:
+        usuario_id = request.POST.get('usuario_id')  # Obtener el id del usuario
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)  # Buscar al usuario por id
+                usuario.delete()  # Eliminar usuario
+                messages.success(request, f"Usuario {usuario.username} eliminado correctamente.")
+            except Usuario.DoesNotExist:
+                messages.error(request, f"El usuario no existe.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
+
+        return redirect('admin_panel_usuarios')
+    
+    # Cambiar contraseña
+    if "change_password" in request.POST:
+        usuario_id = request.POST.get("usuario_id")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if usuario_id and new_password and confirm_password:
+            if new_password == confirm_password:
+                try:
+                    usuario = Usuario.objects.get(id=usuario_id)
+                    usuario.set_password(new_password)
+                    usuario.save()
+                    messages.success(request, f"La contraseña para {usuario.username} ha sido cambiada exitosamente.")
+                except Usuario.DoesNotExist:
+                    messages.error(request, "El usuario no existe.")
+            else:
+                messages.error(request, "Las contraseñas no coinciden.")
+        else:
+            messages.error(request, "Todos los campos son obligatorios.")
+        
+        return redirect('admin_panel_usuarios')
+    
     return render(request, 'admin_panel_usuarios.html', {'usuarios': usuarios})
+
+
+
 
 def obtener_horarios_disponibles(request):
     espacio_id = request.GET.get('espacio_id')
