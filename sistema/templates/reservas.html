@@ -80,7 +80,7 @@
                             <h4 class="card-title h5 fw-semibold text-dark mb-2">{{ reserva.espacio.nombre }}</h4>
                             <p class="card-text text-secondary mb-1 small"><strong>Tipo:</strong> {{ reserva.espacio.get_tipoEspacio_display }}</p>
                             <p class="card-text text-secondary mb-1 small"><strong>Fecha:</strong> {{ reserva.fecha_Reserva|date:"d M Y" }}</p>
-                            <p class="card-text text-secondary mb-3 small"><strong>Hora:</strong> {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}</p>
+                            <p class="card-text text-secondary mb-3 small"><strong>Hora:</strong> {{ reserva.horaInicio|time:"H:i" }} - {{ reserva.horaFin|time:"H:i" }}</p>
                             <p class="card-text text-secondary mb-3 small">
                                 <strong>Estado:</strong>
                                 <span id="estado-reserva-{{ reserva.id }}"

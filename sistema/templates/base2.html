@@ -51,21 +51,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom px-4 py-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center me-auto"> 
-            <a href="{% url 'panel_usuario' %}" class="navbar-brand me-4">
-               <img src="{% static 'imagenes/Preview.png' %}" alt="TeamWare Logo" style="height: 40px;"> 
-            </a>
-            <a href="{% url 'mis_reservas' %}" class="nav-link text-dark me-3 hover-underline">Mis Reservas</a> 
-        </div>
-        
-        <div class="dropdown">
-            <button class="btn btn-transparent text-dark dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Hola, {{ user.username|capfirst }}
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            </ul>
-        </div>
-        
+            
+            </div>
+        <h1 class="navbar-brand mb-0 h1 fw-bold text-dark">Panel del Administrador</h1>
     </nav>
 
     <main class="flex-grow-1 d-flex align-items-center justify-content-center p-3 p-md-4">

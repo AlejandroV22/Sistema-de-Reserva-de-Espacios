@@ -1,16 +1,23 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views 
 
 urlpatterns = [
     path('', views.login_view, name='root'),
-    path('login/', views.login_view, name='login'), 
+    path('login/', views.login_view, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'), 
     path('panel-usuario/', views.panel_usuario_view, name='panel_usuario'),
     path('panel/espacios/', views.panel_espacios, name='panel_espacios'),
     path('panel/espacios/agregar/', views.agregar_espacio, name='agregar_espacio'),
     path('admin/espacios/', views.panel_espacios, name='admin_panel_espacios'),
     path('obtener-horarios/', views.obtener_horarios_disponibles, name='obtener_horarios'),
-    path('reservas/', views.reservas_view, name='reservas'),
+    
+
+    ##
+    path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
     path('confirmar_reserva/', views.confirmar_reserva, name='confirmar_reserva'),
+    path('reservas/<int:reserva_id>/detalle_ajax/', views.detalle_reserva_ajax, name='detalle_reserva_ajax'), 
+    path('reservas/<int:reserva_id>/cancelar/', views.cancelar_reserva, name='cancelar_reserva'),
    
     # Panel de administrador, administración de usuarios, espacios y sanciones (NO BORRAR)
     path('admin-panel/', views.panel_administrador, name='panel_administrador'),

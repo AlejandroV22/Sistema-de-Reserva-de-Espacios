@@ -9,12 +9,13 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST , require_GET
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.contrib import messages
 from .forms import SancionForm
 # Create your views here.
-@require_POST
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -37,10 +38,9 @@ def login_view(request):
        
         return render(request, 'login.html')
 
-@login_required # <--- Protege esta vista: solo usuarios autenticados pueden acceder
+@login_required # <--- solo usuarios autenticados pueden acceder
 def panel_usuario_view(request):
-    # Aquí puedes añadir la lógica para cargar los datos del panel del usuario
-    # Por ejemplo, las reservas del usuario:
+   
     user_reservas = Reserva.objects.filter(usuario=request.user).order_by('fecha_Reserva', 'horaInicio')
     context = {
         'user_reservas': user_reservas,
@@ -98,8 +98,69 @@ def panel_usuarios(request): #Administracion de usuarios
 
 def admin_panel_usuarios(request):
     usuarios = Usuario.objects.all()
+
+    # Agregar usuario
+    if 'add_Usuario' in request.POST:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        rol = request.POST.get('rol')  # Obtener el rol (admin o usuario)
+        
+        if username and password:
+            if Usuario.objects.filter(username=username).exists():
+                messages.error(request, "El nombre de usuario ya está registrado. Por favor, elige otro.")
+                return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+
+            usuario = Usuario.objects.create_user(username=username, email=email, password=password)
+            usuario.first_name = first_name
+            usuario.last_name = last_name
+            usuario.rol = rol  # Asignar el rol al usuario
+            usuario.save()
+            messages.success(request, f"{usuario.username} agregado correctamente.")
+        
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+                
+    # Eliminar usuario
+    if 'delete_user' in request.POST:
+        usuario_id = request.POST.get('user_id')  # Obtener el id del usuario
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)  # Buscar al usuario por id
+                usuario.delete()  # Eliminar usuario
+                messages.success(request, f"Usuario {usuario.username} eliminado correctamente.")
+            except Usuario.DoesNotExist:
+                messages.error(request, f"El usuario no existe.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+    
+    # Cambiar contraseña
+    if "change_password" in request.POST:
+        usuario_id = request.POST.get("usuario_id")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if usuario_id and new_password and confirm_password:
+            if new_password == confirm_password:
+                try:
+                    usuario = Usuario.objects.get(id=usuario_id)
+                    usuario.set_password(new_password)
+                    usuario.save()
+                    messages.success(request, f"La contraseña para {usuario.username} ha sido cambiada exitosamente.")
+                except Usuario.DoesNotExist:
+                    messages.error(request, "El usuario no existe.")
+            else:
+                messages.error(request, "Las contraseñas no coinciden.")
+        else:
+            messages.error(request, "Todos los campos son obligatorios.")
+        
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+    
     return render(request, 'admin_panel_usuarios.html', {'usuarios': usuarios})
 
+####
 def obtener_horarios_disponibles(request):
     espacio_id = request.GET.get('espacio_id')
     fecha_str = request.GET.get('fecha')
@@ -121,8 +182,8 @@ def obtener_horarios_disponibles(request):
         )
 
         disponibles = []
-        # Definir la duración de los bloques que quieres mostrar (ej., 1 hora)
-        intervalo_horas = timedelta(minutes=60) # Puedes cambiar a minutes=30 para intervalos de 30 minutos
+        
+        intervalo_horas = timedelta(minutes=60) #intervalo hora 
 
         for horario_base_item in horarios_base:
             # Iterar desde la hora de inicio del horario base hasta la hora de fin
@@ -139,13 +200,9 @@ def obtener_horarios_disponibles(request):
                 
                 slot_ocupado = False
                 for reserva_item in reservas_existentes:
-                    # Comprobar si el slot actual se superpone con alguna reserva existente
-                    # ¡IMPORTANTE! Asegúrate de que 'hora_inicio' y 'hora_fin' aquí
-                    # coincidan EXACTAMENTE con los nombres de las columnas en tu tabla 'sistema_reserva'
-                    # (ej. si es 'horaInicio', cámbialo a 'reserva_item.horaInicio')
-                    if (reserva_item.horaInicio < slot_end and reserva_item.horaFin > slot_start): # Usar 'hora_inicio' y 'hora_fin' (si aplicaste snake_case en modelo)
-                        slot_ocupado = True
-                        break # Este slot está ocupado, no hay necesidad de seguir verificando
+                 
+                    if (reserva_item.horaInicio < slot_end and reserva_item.horaFin > slot_start): 
+                        break 
 
                 if not slot_ocupado:
                     disponibles.append({
@@ -169,9 +226,15 @@ def obtener_horarios_disponibles(request):
 
 
     
-  
-def reservas_view(request):
-    return render(request, 'reservas.html')
+@login_required
+def mis_reservas(request):
+    
+    reservas_usuario = Reserva.objects.filter(usuario=request.user).order_by('-fecha_Reserva', '-horaInicio')
+
+    context = {
+        'reservas': reservas_usuario
+    }
+    return render(request, 'reservas.html', context)
    
 
 def confirmar_reserva(request):
@@ -285,3 +348,63 @@ def esta_activa(self):
         return True
     return self.fecha_levantamiento > timezone.now()
 
+
+
+
+@login_required
+@require_GET
+def detalle_reserva_ajax(request, reserva_id):
+    try:
+        reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
+
+        fecha_formateada = reserva.fecha_Reserva.strftime("%d %b %Y")
+        hora_inicio_formateada = reserva.horaInicio.strftime("%H:%M") # <-- Usar horaInicio de Reserva
+        hora_fin_formateada = reserva.horaFin.strftime("%H:%M")       # <-- Usar horaFin de Reserva
+
+        data = {
+            'success': True,
+            'espacio_nombre': reserva.espacio.nombre,
+            'tipo_espacio': reserva.espacio.get_tipoEspacio_display(),
+            'fecha_reserva': fecha_formateada,
+            'hora_inicio': hora_inicio_formateada,
+            'hora_fin': hora_fin_formateada,
+            'estado': reserva.get_estado_display(),
+            'recurrente': 'Sí' if reserva.recurrente else 'No' # Asumiendo que tienes un campo 'recurrente'
+        }
+        return JsonResponse(data)
+    except Reserva.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Reserva no encontrada o no pertenece al usuario.'}, status=404)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'message': f'Error al obtener detalles: {str(e)}'}, status=500)
+
+
+# Vista AJAX para cancelar una reserva
+@login_required
+@require_POST
+def cancelar_reserva(request, reserva_id):
+    try:
+        reserva = get_object_or_404(Reserva, id=reserva_id, usuario=request.user)
+
+        if reserva.estado == 'cancelada':
+            return JsonResponse({'success': False, 'message': 'Esta reserva ya ha sido cancelada.'}, status=400)
+
+       
+        reserva.estado = 'cancelada'
+        reserva.save()
+
+        messages.success(request, 'La reserva ha sido cancelada exitosamente.')
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Reserva cancelada exitosamente.',
+            'new_status': reserva.get_estado_display()
+        })
+
+    except Reserva.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Reserva no encontrada o no pertenece al usuario.'}, status=404)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'message': f'Error al cancelar la reserva: {str(e)}'}, status=500)
