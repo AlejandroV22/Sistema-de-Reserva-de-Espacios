@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/espacios/eliminar/<int:espacio_id>/', views.eliminar_espacio, name='eliminar_espacio'),
     path('obtener-horarios/', views.obtener_horarios_disponibles, name='obtener_horarios'),
     path('reservas/', views.reservas_view, name='reservas'),
-    path('confirmar_reserva/', views.confirmar_reserva, name='confirmar_reserva'),
+  
     
     
 ]
