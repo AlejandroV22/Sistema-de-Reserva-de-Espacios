@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 # Create your views here.
-@require_POST
+
 
 def login_view(request):
     if request.method == 'POST':

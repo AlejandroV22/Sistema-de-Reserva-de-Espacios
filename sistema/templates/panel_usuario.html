@@ -266,13 +266,22 @@
             language: 'es'
         });
 
+        // Este evento se adjunta UNA SOLA VEZ al cargar la página
+        $('#reservaModal').on('hidden.bs.modal', function () {
+            console.log("Modal ocultado completamente. Limpiando...");
+            $('body').removeClass('modal-open'); 
+            $('.modal-backdrop').remove();
+            $('html').css('overflow', 'auto');        
+            $('#fechaReserva').trigger('changeDate'); 
+            
+        });
+
         // 2. Apertura del modal de reserva
         $('.reservar-btn').on('click', function () {
             const espacioId = $(this).data('espacio-id');
             console.log("Espacio seleccionado:", espacioId); 
             const espacioNombre = $(this).data('espacio-nombre');
             
-
             $('#modalEspacioId').val(espacioId);
             $('#espacio-nombre-modal').val(espacioNombre);
             $('#nombreEspacioModal').text(espacioNombre);
@@ -368,10 +377,11 @@
                         $('#reservaSuccess').removeClass('d-none').text(response.message);
                         $('#reservaError').addClass('d-none').text('');
                         $('#confirmarReservaBtn').prop('disabled', true);
-                        setTimeout(function () {
-                            $('#reservaModal').modal('hide');
-                            $('#fechaReserva').trigger('changeDate');
-                        }, 2000);
+                        
+                        
+                        $('#reservaModal').modal('hide');
+
+
                     } else {
                         $('#reservaError').removeClass('d-none').text(response.message);
                         $('#reservaSuccess').addClass('d-none').text('');
