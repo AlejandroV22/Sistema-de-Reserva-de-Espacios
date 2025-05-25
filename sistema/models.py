@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 
+
 #MODELO DE USUARIO
 class Usuario(AbstractUser):
     ROL_CHOICES = [
@@ -76,7 +77,7 @@ class Reserva(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADOS, default='confirmada')
     recurrente = models.BooleanField(default=False)
     asistio = models.BooleanField(null=True, blank=True)
-    
+
     def __str__(self):
         return f"Reserva de {self.usuario} en {self.espacio} para el {self.fecha_Reserva} de {self.horaInicio} a {self.horaFin}"
     
@@ -97,8 +98,9 @@ class Notificacion(models.Model):
         return f"Notificación para {self.destinatario} ({self.tipo})"
 
 #MODELO DE SANCIÓN
+
 class Sancion(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='sanciones')
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='sanciones')
     motivo = models.CharField(max_length=200)
     fecha_aplicacion = models.DateTimeField(auto_now_add=True)
     fecha_levantamiento = models.DateTimeField(null=True, blank=True)
@@ -106,6 +108,8 @@ class Sancion(models.Model):
     def __str__(self):
         duracion = "indefinida" if self.fecha_levantamiento is None else (self.fecha_levantamiento - self.fecha_aplicacion).days
         return f"Sanción de {self.usuario} por {self.motivo} ({duracion} días)"
+
+    @property
     def esta_activa(self):
         if self.fecha_levantamiento is None:
             return True

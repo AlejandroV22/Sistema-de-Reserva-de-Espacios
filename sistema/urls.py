@@ -19,13 +19,16 @@ urlpatterns = [
     path('reservas/<int:reserva_id>/detalle_ajax/', views.detalle_reserva_ajax, name='detalle_reserva_ajax'), 
     path('reservas/<int:reserva_id>/cancelar/', views.cancelar_reserva, name='cancelar_reserva'),
    
-    # Panel de administrador y administración de usuarios y espacios (NO BORRAR)
+    # Panel de administrador, administración de usuarios, espacios y sanciones (NO BORRAR)
     path('admin-panel/', views.panel_administrador, name='panel_administrador'),
     path('admin-panel/espacios/', views.panel_espacios, name='admin_panel_espacios'),
     path('admin-panel/usuarios/', views.admin_panel_usuarios, name='admin_panel_usuarios'),
     path('admin-panel/espacios/eliminar/<int:espacio_id>/', views.eliminar_espacio, name='eliminar_espacio'),
     path('admin-panel/reservas/', views.ver_reservas, name='ver_reservas'),
     path('admin-panel/reservas/asistencia/<int:reserva_id>/', views.marcar_asistencia, name='marcar_asistencia'),
+    path('admin-panel/sanciones/aplicar/', views.aplicar_sancion, name='aplicar_sancion'),
+    path('admin-panel/sanciones/', views.ver_sanciones, name='ver_sanciones'),
+
 ]
 
 
