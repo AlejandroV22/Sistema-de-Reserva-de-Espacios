@@ -97,6 +97,66 @@ def panel_usuarios(request): #Administracion de usuarios
 
 def admin_panel_usuarios(request):
     usuarios = Usuario.objects.all()
+
+    # Agregar usuario
+    if 'add_Usuario' in request.POST:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        rol = request.POST.get('rol')  # Obtener el rol (admin o usuario)
+        
+        if username and password:
+            if Usuario.objects.filter(username=username).exists():
+                messages.error(request, "El nombre de usuario ya está registrado. Por favor, elige otro.")
+                return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+
+            usuario = Usuario.objects.create_user(username=username, email=email, password=password)
+            usuario.first_name = first_name
+            usuario.last_name = last_name
+            usuario.rol = rol  # Asignar el rol al usuario
+            usuario.save()
+            messages.success(request, f"{usuario.username} agregado correctamente.")
+        
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+                
+    # Eliminar usuario
+    if 'delete_user' in request.POST:
+        usuario_id = request.POST.get('user_id')  # Obtener el id del usuario
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)  # Buscar al usuario por id
+                usuario.delete()  # Eliminar usuario
+                messages.success(request, f"Usuario {usuario.username} eliminado correctamente.")
+            except Usuario.DoesNotExist:
+                messages.error(request, f"El usuario no existe.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+    
+    # Cambiar contraseña
+    if "change_password" in request.POST:
+        usuario_id = request.POST.get("usuario_id")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if usuario_id and new_password and confirm_password:
+            if new_password == confirm_password:
+                try:
+                    usuario = Usuario.objects.get(id=usuario_id)
+                    usuario.set_password(new_password)
+                    usuario.save()
+                    messages.success(request, f"La contraseña para {usuario.username} ha sido cambiada exitosamente.")
+                except Usuario.DoesNotExist:
+                    messages.error(request, "El usuario no existe.")
+            else:
+                messages.error(request, "Las contraseñas no coinciden.")
+        else:
+            messages.error(request, "Todos los campos son obligatorios.")
+        
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+    
     return render(request, 'admin_panel_usuarios.html', {'usuarios': usuarios})
 
 ####
