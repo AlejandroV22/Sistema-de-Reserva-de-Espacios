@@ -71,7 +71,6 @@ def panel_administrador(request): #Panel de administrador personalizado
 def panel_usuarios(request): #Administracion de usuarios 
     return render(request, 'panel_usuarios.html')  
 
-
 def admin_panel_usuarios(request):
     usuarios = Usuario.objects.all()
 
@@ -82,25 +81,25 @@ def admin_panel_usuarios(request):
         email = request.POST.get('email')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
-        is_staff = request.POST.get('is_staff') == 'True'
-
+        rol = request.POST.get('rol')  # Obtener el rol (admin o usuario)
+        
         if username and password:
             if Usuario.objects.filter(username=username).exists():
                 messages.error(request, "El nombre de usuario ya está registrado. Por favor, elige otro.")
-                return redirect('administrar_usuarios')
+                return redirect('admin_panel_usuarios')  # Cambio realizado aquí
 
-            usuario = Usuario.objects.create_user(username=username, password=password, email=email)
+            usuario = Usuario.objects.create_user(username=username, email=email, password=password)
             usuario.first_name = first_name
             usuario.last_name = last_name
-            usuario.is_staff = is_staff
-            messages.success(request, f"{usuario.username} agregado correctamente.")
+            usuario.rol = rol  # Asignar el rol al usuario
             usuario.save()
-
-        return redirect('admin_panel_usuarios')
+            messages.success(request, f"{usuario.username} agregado correctamente.")
+        
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
                 
     # Eliminar usuario
-    if 'delete_Usuario' in request.POST:
-        usuario_id = request.POST.get('usuario_id')  # Obtener el id del usuario
+    if 'delete_user' in request.POST:
+        usuario_id = request.POST.get('user_id')  # Obtener el id del usuario
         if usuario_id:
             try:
                 usuario = Usuario.objects.get(id=usuario_id)  # Buscar al usuario por id
@@ -110,8 +109,7 @@ def admin_panel_usuarios(request):
                 messages.error(request, f"El usuario no existe.")
             except Exception as e:
                 messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
-
-        return redirect('admin_panel_usuarios')
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
     
     # Cambiar contraseña
     if "change_password" in request.POST:
@@ -133,10 +131,9 @@ def admin_panel_usuarios(request):
         else:
             messages.error(request, "Todos los campos son obligatorios.")
         
-        return redirect('admin_panel_usuarios')
+        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
     
     return render(request, 'admin_panel_usuarios.html', {'usuarios': usuarios})
-
 
 
 

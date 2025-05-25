@@ -88,13 +88,13 @@
                             <input type="text" class="form-control" id="last_name" name="last_name">
                         </div>
                         <div class="mb-3">
-                            <label for="is_staff" class="form-label">¿Será Staff?</label>
-                            <select class="form-control" id="is_staff" name="is_staff" required>
-                                <option value="True">Sí</option>
-                                <option value="False" selected>No</option>
+                            <label for="rol" class="form-label">Rol</label>
+                            <select class="form-control" id="rol" name="rol" required>
+                                <option value="usuario" selected>Usuario</option>
+                                <option value="admin">Administrador</option>
                             </select>
                         </div>
-                        <button type="submit" name="add_user" class="btn btn-primary">Agregar Usuario</button>
+                        <button type="submit" name="add_Usuario" class="btn btn-primary">Agregar Usuario</button>
                     </form>
                 </div>
             </div>
@@ -136,7 +136,7 @@
                 <div class="modal-body">
                     <form method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="user_id" value="{{ usuario.id }}">
+                        <input type="hidden" name="usuario_id" value="{{ usuario.id }}">
                         <div class="mb-3">
                             <label for="new_password" class="form-label">Nueva Contraseña</label>
                             <input type="password" class="form-control" id="new_password" name="new_password" required>
