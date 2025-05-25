@@ -355,14 +355,14 @@
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
-                    //'Content-Type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
-                data: {
+                data: JSON.stringify({
                     espacio_id: espacioId,
                     fecha_Reserva: fecha,
-                    hora_inicio: horaInicio,
-                    hora_fin: horaFin
-                },
+                    horaInicio: horaInicio,
+                    horaFin: horaFin
+                }),
                 success: function (response) {
                     if (response.success) {
                         $('#reservaSuccess').removeClass('d-none').text(response.message);
