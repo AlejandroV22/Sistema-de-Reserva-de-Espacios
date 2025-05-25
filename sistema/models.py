@@ -14,7 +14,6 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.get_rol_display()})"
-from django.db import models
 
 #MODELO DE ESPACIOS
 
@@ -78,7 +77,7 @@ class Reserva(models.Model):
     recurrente = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Reserva de {self.usuario} en {self.espacio} para el {self.fecha} de {self.horaInicio} a {self.horaFin}"
+        return f"Reserva de {self.usuario} en {self.espacio} para el {self.fecha_Reserva} de {self.horaInicio} a {self.horaFin}"
     
 #MODELO DE NOTIFICACIONES
 
@@ -104,8 +103,8 @@ class Sancion(models.Model):
     fecha_levantamiento = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Sanción de {self.usuario} por {self.motivo} ({self.duracion} días)"
-
+        duracion = "indefinida" if self.fecha_levantamiento is None else (self.fecha_levantamiento - self.fecha_aplicacion).days
+        return f"Sanción de {self.usuario} por {self.motivo} ({duracion} días)"
     def esta_activa(self):
         if self.fecha_levantamiento is None:
             return True
