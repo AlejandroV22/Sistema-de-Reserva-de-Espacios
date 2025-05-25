@@ -3,7 +3,8 @@ from .models import Espacio, Usuario, Reserva , HorarioDisponible
 from .forms import EspacioForm 
 from django.http import JsonResponse
 from datetime import datetime
-
+import json
+from django.utils.dateparse import parse_date
 # Create your views here.
 
 
@@ -45,14 +46,14 @@ def admin_panel_usuarios(request):
 
 def obtener_horarios_disponibles(request):
     espacio_id = request.GET.get('espacio_id')
-    fecha_str = request.GET.get('fecha')  # ejemplo: '2025-05-24'
-
+    fecha_str = request.GET.get('fecha')
+    print(f"Espacio recibido: {espacio_id}")
     if not espacio_id or not fecha_str:
         return JsonResponse({'error': 'Parámetros faltantes'}, status=400)
 
     try:
         fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-        dia_semana = fecha.weekday()  # lunes = 0, domingo = 6
+        dia_semana = fecha.weekday()
 
         horarios = HorarioDisponible.objects.filter(espacio_id=espacio_id, dia_semana=dia_semana)
         reservas = Reserva.objects.filter(espacio_id=espacio_id, fecha_Reserva=fecha)
@@ -60,10 +61,11 @@ def obtener_horarios_disponibles(request):
         disponibles = []
 
         for horario in horarios:
-            conflicto = reservas.filter(
-                horaInicio=horario.hora_inicio,
-                horaFin=horario.hora_fin
-            ).exists()
+            conflicto = False
+            for reserva in reservas:
+                if not (reserva.hora_fin <= horario.hora_inicio or reserva.hora_inicio >= horario.hora_fin):
+                    conflicto = True
+                    break
             if not conflicto:
                 disponibles.append({
                     'hora_inicio': horario.hora_inicio.strftime('%H:%M'),
@@ -74,8 +76,70 @@ def obtener_horarios_disponibles(request):
 
     except ValueError:
         return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
-    
 
     
+  
 def reservas_view(request):
     return render(request, 'reservas.html')
+   
+
+def confirmar_reserva(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            espacio_id = data.get('espacio_id')
+            fecha_str = data.get('fecha')
+            hora_inicio_str = data.get('hora_inicio')
+            hora_fin_str = data.get('hora_fin')
+
+            if not (espacio_id and fecha_str and hora_inicio_str and hora_fin_str):
+                return JsonResponse({'success': False, 'message': 'Datos incompletos.'}, status=400)
+
+            fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_fin = datetime.strptime(hora_fin_str, '%H:%M').time()
+
+            espacio = Espacio.objects.get(id=espacio_id)
+
+            # Validar que el horario solicitado esté dentro de un horario disponible para ese día de la semana
+            dia_semana = fecha.weekday()
+            horarios_disponibles = HorarioDisponible.objects.filter(
+                espacio=espacio,
+                dia_semana=dia_semana,
+                hora_inicio__lte=hora_inicio,
+                hora_fin__gte=hora_fin
+            )
+
+            if not horarios_disponibles.exists():
+                return JsonResponse({'success': False, 'message': 'El horario seleccionado no está disponible.'}, status=400)
+
+            # Validar conflictos: reservas que se cruzan con el horario solicitado
+            conflictos = Reserva.objects.filter(
+                espacio=espacio,
+                fecha_Reserva=fecha
+            ).filter(
+                Q(horaInicio__lt=hora_fin) & Q(horaFin__gt=hora_inicio)
+            )
+
+            if conflictos.exists():
+                return JsonResponse({'success': False, 'message': 'El horario seleccionado ya está reservado.'}, status=409)
+
+            # Crear reserva
+            Reserva.objects.create(
+                usuario=request.user if request.user.is_authenticated else None,
+                espacio=espacio,
+                fecha_Reserva=fecha,
+                horaInicio=hora_inicio,
+                horaFin=hora_fin,
+            )
+
+            return JsonResponse({'success': True, 'message': 'Reserva confirmada exitosamente.'})
+
+        except Espacio.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Espacio no encontrado.'}, status=404)
+        except ValueError:
+            return JsonResponse({'success': False, 'message': 'Formato de fecha u hora inválido.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Error inesperado: {str(e)}'}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
