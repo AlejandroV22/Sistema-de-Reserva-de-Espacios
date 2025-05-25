@@ -74,3 +74,8 @@ def obtener_horarios_disponibles(request):
 
     except ValueError:
         return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
+    
+
+    
+def reservas_view(request):
+    return render(request, 'reservas.html')

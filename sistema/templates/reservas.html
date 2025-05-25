@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Reservas{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Mis Reservas</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if reservas %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Espacio</th>
+                        <th>Fecha</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.espacio.nombre }}</td>
+                        <td>{{ reserva.fecha_Reserva|date:"d M, Y" }}</td>
+                        <td>{{ reserva.horaInicio|time:"H:i" }}</td>
+                        <td>{{ reserva.horaFin|time:"H:i" }}</td>
+                        <td>
+                            {% if reserva.estado == 'confirmada' %}
+                                <span class="badge bg-success">{{ reserva.get_estado_display }}</span>
+                            {% elif reserva.estado == 'en_espera' %}
+                                <span class="badge bg-warning text-dark">{{ reserva.get_estado_display }}</span>
+                            {% elif reserva.estado == 'cancelada' or reserva.estado == 'no_asistida' %}
+                                <span class="badge bg-danger">{{ reserva.get_estado_display }}</span>
+                            {% elif reserva.estado == 'finalizada' %}
+                                <span class="badge bg-secondary">{{ reserva.get_estado_display }}</span>
+                            {% else %}
+                                <span class="badge bg-info">{{ reserva.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'detalle_reserva' reserva.id %}" class="btn btn-info btn-sm me-2">Ver Detalles</a>
+                            
+                            {# Lógica para mostrar/ocultar el botón "Cancelar Reserva" #}
+                            {% comment %} 
+                                Una reserva se puede cancelar si:
+                                1. Su estado es 'confirmada' o 'en_espera'.
+                                2. La fecha y hora de la reserva aún no ha pasado.
+                                3. (Opcional, implementado en la vista) No está demasiado cerca de la hora de inicio.
+                            {% endcomment %}
+
+                            {% with fecha_hora_reserva=reserva.fecha_Reserva|date:"Y-m-d"|add:" "|add:reserva.horaInicio|time:"H:i:s" %}
+                                {% comment %} Convertir la fecha y hora de la reserva a un objeto datetime en la plantilla es complicado.
+                                    Es mejor pasar un `datetime` aware desde la vista y comparar allí, como ya se hizo en `cancelar_reserva_view`.
+                                    Aquí, solo verificamos el estado y si la fecha es futura.
+                                {% endcomment %}
+                                
+                                {% comment %} Para ser más precisos con la hora actual, la lógica se maneja mejor en la vista.
+                                    Aquí simplemente mostramos el botón si el estado lo permite. {% endcomment %}
+
+                                {% if reserva.estado == 'confirmada' or reserva.estado == 'en_espera' %}
+                                    {# Pasamos el tiempo actual desde la vista para una mejor comparación #}
+                                    {% if reserva.fecha_Reserva > now.date or reserva.fecha_Reserva == now.date and reserva.horaInicio > now.time %}
+                                        <form action="{% url 'cancelar_reserva' reserva.id %}" method="post" class="d-inline-block">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres cancelar esta reserva?');">Cancelar Reserva</button>
+                                        </form>
+                                    {% else %}
+                                        {# Si ya pasó la fecha/hora de inicio, el botón no se muestra #}
+                                        <button class="btn btn-secondary btn-sm" disabled>Ya Finalizada/Pasada</button>
+                                    {% endif %}
+                                {% else %}
+                                    {# Si el estado no es confirmada o en espera, no se permite cancelar #}
+                                    <button class="btn btn-secondary btn-sm" disabled>No Cancelable</button>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No tienes ninguna reserva hecha aún. ¡Explora nuestros espacios y haz tu primera reserva!
+            <br><a href="{% url 'panel_usuario' %}" class="alert-link">Ver Espacios Disponibles</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
