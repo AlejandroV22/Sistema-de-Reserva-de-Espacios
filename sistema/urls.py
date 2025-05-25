@@ -1,9 +1,11 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views 
 
 urlpatterns = [
     path('', views.login_view, name='root'),
-    path('login/', views.login_view, name='login'), 
+    path('login/', views.login_view, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'), 
     path('panel-usuario/', views.panel_usuario_view, name='panel_usuario'),
     path('panel/espacios/', views.panel_espacios, name='panel_espacios'),
     path('panel/espacios/agregar/', views.agregar_espacio, name='agregar_espacio'),
