@@ -9,8 +9,13 @@ urlpatterns = [
     path('panel/espacios/agregar/', views.agregar_espacio, name='agregar_espacio'),
     path('admin/espacios/', views.panel_espacios, name='admin_panel_espacios'),
     path('obtener-horarios/', views.obtener_horarios_disponibles, name='obtener_horarios'),
-    path('reservas/', views.reservas_view, name='reservas'),
+    
+
+    ##
+    path('mis-reservas/', views.mis_reservas, name='mis_reservas'),
     path('confirmar_reserva/', views.confirmar_reserva, name='confirmar_reserva'),
+    path('reservas/<int:reserva_id>/detalle_ajax/', views.detalle_reserva_ajax, name='detalle_reserva_ajax'), 
+    path('reservas/<int:reserva_id>/cancelar/', views.cancelar_reserva, name='cancelar_reserva'),
    
     # Panel de administrador y administración de usuarios y espacios (NO BORRAR)
     path('admin-panel/', views.panel_administrador, name='panel_administrador'),

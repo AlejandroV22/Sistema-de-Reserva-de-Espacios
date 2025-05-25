@@ -51,8 +51,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom px-4 py-3 d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center me-auto"> 
-            <a href="{% url 'reservas' %}" class="nav-link text-dark me-3 hover-underline">Mis Reservas</a> 
-            </div>
+            <a href="{% url 'panel_usuario' %}" class="navbar-brand me-4">
+               <img src="{% static 'imagenes/Preview.png' %}" alt="TeamWare Logo" style="height: 40px;"> 
+            </a>
+            <a href="{% url 'mis_reservas' %}" class="nav-link text-dark me-3 hover-underline">Mis Reservas</a> 
+        </div>
         <h1 class="navbar-brand mb-0 h1 fw-bold text-dark">Panel del Usuario</h1>
     </nav>
 
