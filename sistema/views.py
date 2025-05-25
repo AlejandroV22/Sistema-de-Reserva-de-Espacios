@@ -9,8 +9,11 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.views.decorators.http import require_POST
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 # Create your views here.
-
+@require_POST
 
 def login_view(request):
     if request.method == 'POST':
@@ -66,6 +69,28 @@ def eliminar_espacio(request, espacio_id):
 
 def panel_administrador(request): #Panel de administrador personalizado
     return render(request, 'panel_administrador.html')
+
+
+def ver_reservas(request):#Ver reservas en el panel de administrador
+    reservas = Reserva.objects.select_related('usuario', 'espacio').all()
+    return render(request, 'ver_reservas.html', {'reservas': reservas})
+
+
+def marcar_asistencia(request, reserva_id):
+    reserva = get_object_or_404(Reserva, id=reserva_id)
+    asistio = request.POST.get("asistio")
+
+    if asistio == "True":
+        reserva.asistio = True
+    elif asistio == "False":
+        reserva.asistio = False
+    else:
+        reserva.asistio = True # o lo que consideres por defecto
+
+    reserva.save()
+    return HttpResponseRedirect(reverse('ver_reservas'))
+
+
 
 def panel_usuarios(request): #Administracion de usuarios 
     return render(request, 'panel_usuarios.html')  
