@@ -71,7 +71,7 @@
                     <p class="card-text text-secondary mb-3 small">Agenda tu espacio ideal para reuniones y colaboraciones profesionales.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal" 
-                            data-espacio-id="1"        {# ID del espacio #}
+                            data-espacio-id="14"        {# ID del espacio #}
                             data-espacio-nombre="Salón Social"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -87,7 +87,7 @@
                     <p class="card-text text-secondary mb-3 small">Mantente en forma con acceso ilimitado a nuestras modernas instalaciones.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="2"        {# ID del espacio #}
+                            data-espacio-id="13"        {# ID del espacio #}
                             data-espacio-nombre="Gimnasio"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -103,7 +103,7 @@
                     <p class="card-text text-secondary mb-3 small">Disfruta del mejor cine sin salir de casa, en un espacio cómodo y exclusivo para residentes</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="3"        {# ID del espacio #}
+                            data-espacio-id="15"        {# ID del espacio #}
                             data-espacio-nombre="Sala de Cine"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -119,7 +119,7 @@
                     <p class="card-text text-secondary mb-3 small">Relájate y refréscate en nuestra piscina, el oasis perfecto para escapar del calor.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="4"        {# ID del espacio #}
+                            data-espacio-id="9"        {# ID del espacio #}
                             data-espacio-nombre="Piscina"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -135,7 +135,7 @@
                     <p class="card-text text-secondary mb-3 small">Disfruta del calor reconfortante de nuestro sauna para una experiencia de renovación total.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="5"        {# ID del espacio #}
+                            data-espacio-id="10"        {# ID del espacio #}
                             data-espacio-nombre="Sauna"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -151,7 +151,7 @@
                     <p class="card-text text-secondary mb-3 small">Purifica tu cuerpo y relaja tu mente en la atmósfera de vapor de nuestro baño turco.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="6"        {# ID del espacio #}
+                            data-espacio-id="12"        {# ID del espacio #}
                             data-espacio-nombre="Turco"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -167,7 +167,7 @@
                     <p class="card-text text-secondary mb-3 small">Tu espacio perfecto para el deporte: nuestra cancha sintética te espera para tus mejores jugadas y entrenamientos.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="6"        {# ID del espacio #}
+                            data-espacio-id="11"        {# ID del espacio #}
                             data-espacio-nombre="Cancha Sintética"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -184,7 +184,7 @@
                     <p class="card-text text-secondary mb-3 small">"El sabor de tus reuniones se eleva en nuestra Zona BBQ. Reserva tu espacio y enciende la parrilla.</p>
                     <button type="button" class="btn btn-purple-dark w-100 py-2 reservar-btn"
                             data-bs-toggle="modal" data-bs-target="#reservaModal"
-                            data-espacio-id="6"        {# ID del espacio #}
+                            data-espacio-id="8"        {# ID del espacio #}
                             data-espacio-nombre="Zona BBQ"> {# Nombre del espacio #}
                         Reservar Ahora
                     </button>
@@ -240,201 +240,150 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            // 1. Inicializar el Datepicker
-            $('#fechaReserva').datepicker({
-                format: 'yyyy-mm-dd',       // Formato de fecha de salida (ej. 2024-05-24)
-                autoclose: true,            // Se cierra automáticamente al seleccionar una fecha
-                todayHighlight: true,       // Resalta la fecha de hoy
-                startDate: 'today',         // Impide seleccionar fechas anteriores a hoy
-                language: 'es'              // Establece el idioma del calendario a español
-            });
-
-            // 2. Manejar la apertura del modal de reserva
-            // Cuando un botón con la clase 'reservar-btn' es clickeado y abre el modal
-            $('.reservar-btn').on('click', function() {
-                const espacioId = $(this).data('espacio-id');      // Obtiene el ID del espacio del atributo data-
-                const espacioNombre = $(this).data('espacio-nombre'); // Obtiene el nombre del espacio del atributo data-
-
-                // Almacena el ID y nombre del espacio en campos ocultos del modal
-                $('#modalEspacioId').val(espacioId);
-                $('#espacio-nombre-modal').val(espacioNombre);
-                // Actualiza el título del modal para mostrar el nombre del espacio
-                $('#nombreEspacioModal').text(espacioNombre);
-
-                // Reinicia el estado del modal cada vez que se abre
-                $('#fechaReserva').val(''); // Borra la fecha seleccionada
-                $('#horasDisponiblesContainer').html('<p class="text-muted w-100" id="mensaje-horas">Selecciona una fecha para ver las horas.</p>'); // Limpia y muestra el mensaje inicial
-                $('#horaInicioSeleccionada').val(''); // Limpia la hora de inicio seleccionada
-                $('#horaFinSeleccionada').val('');   // Limpia la hora de fin seleccionada
-                $('#confirmarReservaBtn').prop('disabled', true); // Deshabilita el botón de confirmar
-                $('#reservaError').addClass('d-none').text('');   // Oculta y limpia mensajes de error
-                $('#reservaSuccess').addClass('d-none').text(''); // Oculta y limpia mensajes de éxito
-            });
-
-
-            // 3. Cuando se selecciona una fecha en el calendario (datepicker)
-            $('#fechaReserva').on('changeDate', function(e) {
-                const fechaSeleccionada = $(this).val(); // La fecha que el usuario seleccionó
-                const espacioId = $('#modalEspacioId').val(); // El ID del espacio actual del modal
-
-                $('#horasDisponiblesContainer').empty(); // Limpia el contenedor de horas anteriores
-                $('#horaInicioSeleccionada').val('');
-                $('#horaFinSeleccionada').val('');
-                $('#confirmarReservaBtn').prop('disabled', true); // Deshabilita el botón al cambiar la fecha
-                $('#reservaError').addClass('d-none').text('');
-                $('#reservaSuccess').addClass('d-none').text('');
-
-                if (fechaSeleccionada && espacioId) {
-                    // *** AQUÍ ES DONDE NORMALMENTE HARÍAS UNA LLAMADA AJAX A TU BACKEND ***
-                    // Para este ejercicio (solo frontend), SIMULAMOS las horas disponibles.
-                    const horasSimuladas = generarHorasSimuladas(fechaSeleccionada, espacioId);
-
-                    if (horasSimuladas.length > 0) {
-                        horasSimuladas.forEach(function(hora) {
-                            // Crea un elemento HTML para cada hora disponible
-                            const horaItem = `<div class="hora-item" 
-                                                data-hora-inicio="${hora.hora_inicio}" 
-                                                data-hora-fin="${hora.hora_fin}">
-                                                ${hora.hora_inicio} - ${hora.hora_fin}
-                                              </div>`;
-                            $('#horasDisponiblesContainer').append(horaItem); // Añade el elemento al contenedor
-                        });
-                    } else {
-                        $('#horasDisponiblesContainer').html('<p class="text-muted w-100">No hay horas disponibles para esta fecha.</p>');
-                    }
-                } else {
-                    // Si no hay fecha o espacio, muestra el mensaje inicial
-                    $('#horasDisponiblesContainer').html('<p class="text-muted w-100" id="mensaje-horas">Selecciona una fecha para ver las horas.</p>');
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-            });
-
-            // Función para simular horas disponibles (SIN BACKEND)
-            // Esta función te permitiría probar diferentes escenarios en el frontend.
-            function generarHorasSimuladas(fecha, espacioId) {
-                let horas = [];
-                let intervalosBase = [];
-
-                // Lógica de simulación: horas diferentes para diferentes espacios
-                if (espacioId == 1) { // Salón Social
-                    intervalosBase = [
-                        { start: '09:00', end: '10:00' }, { start: '10:00', end: '11:00' },
-                        { start: '11:00', end: '12:00' }, { start: '14:00', end: '15:00' },
-                        { start: '15:00', end: '16:00' }, { start: '16:00', end: '17:00' }
-                    ];
-                } else if (espacioId == 2) { // Gimnasio
-                    intervalosBase = [
-                        { start: '07:00', end: '08:00' }, { start: '08:00', end: '09:00' },
-                        { start: '09:00', end: '10:00' }, { start: '17:00', end: '18:00' },
-                        { start: '18:00', end: '19:00' }, { start: '19:00', end: '20:00' }
-                    ];
-                } else { // Para otros espacios (Sala de Cine, Piscina, Sauna, Turco)
-                    intervalosBase = [
-                        { start: '10:00', end: '11:00' }, { start: '11:00', end: '12:00' },
-                        { start: '13:00', end: '14:00' }, { start: '16:00', end: '17:00' },
-                        { start: '17:00', end: '18:00' }
-                    ];
-                }
-
-                // Ejemplo de simulación de "ocupado" para una fecha y hora específica
-                const fechaOcupadaSalon = '2025-06-25'; // Simula que el Salón Social está ocupado el 25 de junio de 2025
-                if (espacioId == 1 && fecha === fechaOcupadaSalon) {
-                    // Filtrar la hora de 14:00 a 15:00 como "ocupada" para este espacio y fecha
-                    return intervalosBase.filter(h => !(h.start === '14:00' && h.end === '15:00'));
-                }
-
-                const fechaOcupadaGimnasio = '2025-06-26'; // Simula que el Gimnasio está ocupado el 26 de junio de 2025
-                if (espacioId == 2 && fecha === fechaOcupadaGimnasio) {
-                    // Simular que el Gimnasio está cerrado por la mañana este día
-                    return intervalosBase.filter(h => !(h.start >= '07:00' && h.end <= '10:00'));
-                }
-
-
-                return intervalosBase; // Devuelve las horas base si no hay una simulación específica
             }
+        }
+        return cookieValue;
+    }
 
+    $(document).ready(function () {
+        // 1. Inicializar el Datepicker
+        $('#fechaReserva').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            startDate: 'today',
+            language: 'es'
+        });
 
-            // 4. Cuando el usuario selecciona una hora disponible en la lista
-            // Usamos delegación de eventos (.on) porque los .hora-item se añaden dinámicamente
-            $(document).on('click', '.hora-item', function() {
-                $('.hora-item').removeClass('selected'); // Quita la clase 'selected' de todas las horas
-                $(this).addClass('selected');           // Añade la clase 'selected' a la hora clickeada
-                
-                // Guarda las horas de inicio y fin del slot seleccionado en los campos ocultos
-                const horaInicio = $(this).data('hora-inicio');
-                const horaFin = $(this).data('hora-fin');
-                $('#horaInicioSeleccionada').val(horaInicio);
-                $('#horaFinSeleccionada').val(horaFin);
+        // 2. Apertura del modal de reserva
+        $('.reservar-btn').on('click', function () {
+            const espacioId = $(this).data('espacio-id');
+            console.log("Espacio seleccionado:", espacioId); 
+            const espacioNombre = $(this).data('espacio-nombre');
+            
 
-                $('#confirmarReservaBtn').prop('disabled', false); // Habilita el botón de confirmar reserva
-            });
+            $('#modalEspacioId').val(espacioId);
+            $('#espacio-nombre-modal').val(espacioNombre);
+            $('#nombreEspacioModal').text(espacioNombre);
 
-            // 5. Cuando se hace clic en el botón "Confirmar Reserva" (simulación frontend)
-            $('#confirmarReservaBtn').on('click', function() {
-                const espacioId = $('#modalEspacioId').val();
-                const espacioNombre = $('#espacio-nombre-modal').val();
-                const fecha = $('#fechaReserva').val();
-                const horaInicio = $('#horaInicioSeleccionada').val();
-                const horaFin = $('#horaFinSeleccionada').val();
+            $('#fechaReserva').val('');
+            $('#horasDisponiblesContainer').html('<p class="text-muted w-100" id="mensaje-horas">Selecciona una fecha para ver las horas.</p>');
+            $('#horaInicioSeleccionada').val('');
+            $('#horaFinSeleccionada').val('');
+            $('#confirmarReservaBtn').prop('disabled', true);
+            $('#reservaError').addClass('d-none').text('');
+            $('#reservaSuccess').addClass('d-none').text('');
+        });
 
-                // Validación básica de que todos los campos necesarios estén seleccionados
-                if (!fecha || !horaInicio || !horaFin) {
-                    $('#reservaError').removeClass('d-none').text('Por favor, selecciona una fecha y una hora.');
-                    return;
-                }
+        // 3. Selección de fecha
+        $('#fechaReserva').on('changeDate', function (e) {
+            const fechaSeleccionada = $(this).val();
+            const espacioId = $('#modalEspacioId').val();
 
-                // *** ESTO ES UNA SIMULACIÓN DE LA RESERVA (SIN BACKEND) ***
-                // En un proyecto real, aquí harías una solicitud AJAX POST a tu vista de Django
-                // para enviar estos datos y que se guarden en la base de datos.
-                // Ejemplo de cómo sería la llamada AJAX (pero no la ejecutaríamos para esta demostración)
-                /*
+            $('#horasDisponiblesContainer').empty();
+            $('#horaInicioSeleccionada').val('');
+            $('#horaFinSeleccionada').val('');
+            $('#confirmarReservaBtn').prop('disabled', true);
+            $('#reservaError').addClass('d-none').text('');
+            $('#reservaSuccess').addClass('d-none').text('');
+
+            if (fechaSeleccionada && espacioId) {
                 $.ajax({
-                    url: `/reservar/${espacioId}/`, // URL de tu vista de Django para procesar la reserva
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': getCookie('csrftoken') }, // Necesario para Django POST
-                    data: {
-                        fecha: fecha,
-                        hora_inicio: horaInicio,
-                        hora_fin: horaFin
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $('#reservaSuccess').removeClass('d-none').text(response.message);
-                            $('#reservaError').addClass('d-none').text('');
-                            // Opcional: Cerrar el modal o refrescar UI después de un éxito
-                            setTimeout(function() {
-                                $('#reservaModal').modal('hide');
-                                // Podrías disparar el changeDate para que las horas se actualicen
-                                // y la hora recién reservada ya no aparezca
-                                $('#fechaReserva').trigger('changeDate');
-                            }, 2000);
+                    url: `/obtener-horarios/?espacio_id=${espacioId}&fecha=${fechaSeleccionada}`,
+                    method: 'GET',
+                    success: function (response) {
+                        if (response.horarios && response.horarios.length > 0) {
+                            response.horarios.forEach(function (hora) {
+                                const horaItem = `<div class="hora-item" 
+                                    data-hora-inicio="${hora.hora_inicio}" 
+                                    data-hora-fin="${hora.hora_fin}">
+                                    ${hora.hora_inicio} - ${hora.hora_fin}
+                                </div>`;
+                                $('#horasDisponiblesContainer').append(horaItem);
+                            });
                         } else {
-                            $('#reservaError').removeClass('d-none').text(response.message);
-                            $('#reservaSuccess').addClass('d-none').text('');
+                            $('#horasDisponiblesContainer').html('<p class="text-muted w-100">No hay horas disponibles para esta fecha.</p>');
                         }
                     },
-                    error: function(xhr, status, error) {
-                        $('#reservaError').removeClass('d-none').text('Error al procesar la reserva. Intenta de nuevo.');
-                        $('#reservaSuccess').addClass('d-none').text('');
-                        console.error('Error AJAX:', error);
+                    error: function (xhr) {
+                        console.error(xhr);
+                        $('#horasDisponiblesContainer').html('<p class="text-danger">Error al obtener los horarios disponibles.</p>');
                     }
                 });
-                */
+            }
+        });
 
-                // Simulación de éxito en el frontend
-                $('#reservaSuccess').removeClass('d-none').text(`¡Reserva de ${espacioNombre} el ${fecha} de ${horaInicio} a ${horaFin} confirmada con éxito!`);
-                $('#reservaError').addClass('d-none').text('');
-                $('#confirmarReservaBtn').prop('disabled', true); // Deshabilita el botón para evitar reservas duplicadas
+        // 4. Selección de hora
+        $(document).on('click', '.hora-item', function () {
+            $('.hora-item').removeClass('selected');
+            $(this).addClass('selected');
 
-                // Cierra el modal y reinicia para una nueva reserva
-                setTimeout(function() {
-                    $('#reservaModal').modal('hide');
-                    // Opcional: Podrías querer "refrescar" el estado del botón o de la tarjeta del espacio
-                    // para indicar que ya se reservó una hora ese día, pero eso va más allá del alcance del frontend puro.
-                }, 2500); // Cierra el modal después de 2.5 segundos
+            const horaInicio = $(this).data('hora-inicio');
+            const horaFin = $(this).data('hora-fin');
+            $('#horaInicioSeleccionada').val(horaInicio);
+            $('#horaFinSeleccionada').val(horaFin);
+
+            $('#confirmarReservaBtn').prop('disabled', false);
+        });
+
+        // 5. Confirmar reserva
+        $('#confirmarReservaBtn').on('click', function () {
+            const espacioId = $('#modalEspacioId').val();
+            const espacioNombre = $('#espacio-nombre-modal').val();
+            const fecha = $('#fechaReserva').val();
+            const horaInicio = $('#horaInicioSeleccionada').val();
+            const horaFin = $('#horaFinSeleccionada').val();
+
+            if (!fecha || !horaInicio || !horaFin) {
+                $('#reservaError').removeClass('d-none').text('Por favor, selecciona una fecha y una hora.');
+                return;
+            }
+
+            $.ajax({
+                url: '/confirmar_reserva/',
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    //'Content-Type': 'application/json'
+                },
+                data: {
+                    espacio_id: espacioId,
+                    fecha_Reserva: fecha,
+                    hora_inicio: horaInicio,
+                    hora_fin: horaFin
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#reservaSuccess').removeClass('d-none').text(response.message);
+                        $('#reservaError').addClass('d-none').text('');
+                        $('#confirmarReservaBtn').prop('disabled', true);
+                        setTimeout(function () {
+                            $('#reservaModal').modal('hide');
+                            $('#fechaReserva').trigger('changeDate');
+                        }, 2000);
+                    } else {
+                        $('#reservaError').removeClass('d-none').text(response.message);
+                        $('#reservaSuccess').addClass('d-none').text('');
+                    }
+                },
+                error: function (xhr) {
+                    const msg = xhr.responseJSON?.message || 'Error inesperado al confirmar reserva.';
+                    $('#reservaError').removeClass('d-none').text(msg);
+                    $('#reservaSuccess').addClass('d-none').text('');
+                }
             });
         });
-    </script>
+    });
+</script>
 {% endblock %}

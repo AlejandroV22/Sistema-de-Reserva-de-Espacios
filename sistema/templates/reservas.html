@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mis Reservas - TeamWare{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+        /* Re-define las clases personalizadas para asegurar que estén disponibles en esta plantilla */
+        .card-hover-effect {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        .text-purple-dark {
+            color: #1d023a;
+        }
+        .btn-purple-dark {
+            background-color: #1d023a;
+            border-color: #1d023a;
+            color: white;
+        }
+        .btn-purple-dark:hover {
+            background-color: #310C5C;
+            border-color: #310C5C;
+        }
+        /* Estilos para el estado de las reservas (badges) */
+        .badge-confirmada {
+            background-color: #d1e7dd; /* Light green */
+            color: #0f5132; /* Dark green */
+        }
+        .badge-cancelada {
+            background-color: #f8d7da; /* Light red */
+            color: #842029; /* Dark red */
+        }
+        .badge-pendiente {
+            background-color: #cfe2ff; /* Light blue */
+            color: #052c65; /* Dark blue */
+        }
+        .badge-no-asistida {
+            background-color: #f8d7da; /* Light red */
+            color: #842029; /* Dark red */
+        }
+        /* Estilos para los modales, si necesitas sobrescribir algo de Bootstrap */
+        #detalleReservaModal .modal-body strong,
+        #confirmarCancelacionModal .modal-body strong {
+            color: #1d023a; /* Aplicar el color morado oscuro a los textos importantes dentro del modal */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 class="display-6 fw-bolder mb-3 text-purple-dark d-flex align-items-center">
+        Tus Reservas Activas <span class="ms-3 display-4 display-md-3">📝</span>
+    </h2>
+    <p class="text-secondary mb-4">Aquí puedes ver el estado de tus reservas y gestionarlas.</p>
+
+    {# Mensajes de Django #}
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if reservas %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            {% for reserva in reservas %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm overflow-hidden card-hover-effect">
+                        {# Puedes añadir una imagen si quieres que las tarjetas de reserva la tengan #}
+                        {# <img class="card-img-top" src="{% static 'path/to/tu_imagen.jpg' %}" alt="Imagen del Espacio" style="height: 192px; object-fit: cover;"> #}
+                        <div class="card-body">
+                            <h4 class="card-title h5 fw-semibold text-dark mb-2">{{ reserva.espacio.nombre }}</h4>
+                            <p class="card-text text-secondary mb-1 small"><strong>Tipo:</strong> {{ reserva.espacio.get_tipoEspacio_display }}</p>
+                            <p class="card-text text-secondary mb-1 small"><strong>Fecha:</strong> {{ reserva.fecha_Reserva|date:"d M Y" }}</p>
+                            <p class="card-text text-secondary mb-3 small"><strong>Hora:</strong> {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}</p>
+                            <p class="card-text text-secondary mb-3 small">
+                                <strong>Estado:</strong>
+                                <span id="estado-reserva-{{ reserva.id }}"
+                                      class="badge
+                                      {% if reserva.estado == 'confirmada' %}badge-confirmada{% elif reserva.estado == 'cancelada' %}badge-cancelada{% elif reserva.estado == 'no_asistida' %}badge-no-asistida{% else %}badge-pendiente{% endif %}">
+                                    {{ reserva.get_estado_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
+                            {# Botón para abrir el modal de detalles #}
+                            <button type="button" class="btn btn-primary btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#detalleReservaModal"
+                                    data-reserva-id="{{ reserva.id }}">
+                                Ver Detalles
+                            </button>
+
+                            {# Botón para abrir el modal de cancelación #}
+                            <button type="button" class="btn btn-danger btn-sm cancelar-reserva-btn"
+                                    data-bs-toggle="modal" data-bs-target="#confirmarCancelacionModal"
+                                    data-reserva-id="{{ reserva.id }}"
+                                    data-espacio-nombre="{{ reserva.espacio.nombre }}"
+                                    data-fecha-reserva="{{ reserva.fecha_Reserva|date:"d M Y" }}"
+                                    {% if reserva.estado != 'confirmada' %}disabled{% endif %}>
+                                Cancelar Reserva
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-5" role="alert">
+            No tienes reservas realizadas.
+        </div>
+    {% endif %}
+
+    <div class="modal fade" id="detalleReservaModal" tabindex="-1" aria-labelledby="detalleReservaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleReservaModalLabel">Detalles de la Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalDetalleCuerpo">
+                    {# Los detalles se cargarán aquí con JavaScript #}
+                    <p><strong>Espacio:</strong> <span id="detalleEspacioNombre">Cargando...</span></p>
+                    <p><strong>Tipo de Espacio:</strong> <span id="detalleTipoEspacio"></span></p>
+                    <p><strong>Fecha:</strong> <span id="detalleFechaReserva"></span></p>
+                    <p><strong>Hora de Inicio:</strong> <span id="detalleHoraInicio"></span></p>
+                    <p><strong>Hora de Fin:</strong> <span id="detalleHoraFin"></span></p>
+                    <p><strong>Estado:</strong> <span id="detalleEstado"></span></p>
+                    <p><strong>¿Recurrente?:</strong> <span id="detalleRecurrente"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmarCancelacionModal" tabindex="-1" aria-labelledby="confirmarCancelacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarCancelacionModalLabel">Confirmar Cancelación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que quieres cancelar la reserva para el espacio <strong id="espacioACancelar"></strong> el día <strong id="fechaACancelar"></strong>?</p>
+                    <input type="hidden" id="reservaIdACancelar">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, mantener</button>
+                    <button type="button" class="btn btn-danger" id="confirmarCancelacionBtn">Sí, cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.es.min.js"></script>
+
+    <script>
+        // Función para obtener el token CSRF de las cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejador para el modal de Detalles
+            const detalleReservaModal = document.getElementById('detalleReservaModal');
+            detalleReservaModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Botón que disparó el modal
+                const reservaId = button.getAttribute('data-reserva-id');
+                const url = `/reservas/${reservaId}/detalle_ajax/`; // Asegúrate de que esta URL sea correcta
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error de red o el servidor no respondió correctamente');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Rellena los campos del modal con los datos recibidos
+                        document.getElementById('detalleEspacioNombre').textContent = data.espacio_nombre;
+                        document.getElementById('detalleTipoEspacio').textContent = data.tipo_espacio;
+                        document.getElementById('detalleFechaReserva').textContent = data.fecha_reserva;
+                        document.getElementById('detalleHoraInicio').textContent = data.hora_inicio;
+                        document.getElementById('detalleHoraFin').textContent = data.hora_fin;
+                        document.getElementById('detalleEstado').textContent = data.estado;
+                        document.getElementById('detalleRecurrente').textContent = data.recurrente;
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener detalles de la reserva:', error);
+                        document.getElementById('modalDetalleCuerpo').innerHTML = '<p class="text-danger">No se pudieron cargar los detalles de la reserva.</p>';
+                    });
+            });
+
+            // Manejador para el modal de Confirmación de Cancelación
+            const confirmarCancelacionModal = document.getElementById('confirmarCancelacionModal');
+            confirmarCancelacionModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Botón que disparó el modal
+                const reservaId = button.getAttribute('data-reserva-id');
+                const espacioNombre = button.getAttribute('data-espacio-nombre');
+                const fechaReserva = button.getAttribute('data-fecha-reserva');
+
+                document.getElementById('reservaIdACancelar').value = reservaId;
+                document.getElementById('espacioACancelar').textContent = espacioNombre;
+                document.getElementById('fechaACancelar').textContent = fechaReserva;
+            });
+
+            // Lógica para el botón "Sí, cancelar" dentro del modal de confirmación
+            const confirmarCancelacionBtn = document.getElementById('confirmarCancelacionBtn');
+            confirmarCancelacionBtn.addEventListener('click', function() {
+                const reservaId = document.getElementById('reservaIdACancelar').value;
+                const url = `/reservas/${reservaId}/cancelar/`; // Asegúrate de que esta URL sea correcta
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                })
+                .then(response => {
+                    // Cerrar el modal de Bootstrap
+                    const modalInstance = bootstrap.Modal.getInstance(confirmarCancelacionModal);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const estadoSpan = document.getElementById(`estado-reserva-${reservaId}`);
+                        if (estadoSpan) {
+                            estadoSpan.textContent = data.new_status;
+                            // Actualizar clases para el color del badge de estado
+                            estadoSpan.classList.remove('badge-confirmada', 'badge-pendiente');
+                            estadoSpan.classList.add('badge-cancelada');
+
+                            const cancelButton = document.querySelector(`.cancelar-reserva-btn[data-reserva-id="${reservaId}"]`);
+                            if (cancelButton) {
+                                cancelButton.disabled = true; // Deshabilita el botón
+                            }
+                        }
+                        // Mostrar alerta de éxito
+                        showAlert('success', data.message);
+                    } else {
+                        // Mostrar alerta de error
+                        showAlert('danger', `Error: ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error durante la cancelación:', error);
+                    let errorMessage = 'Ocurrió un error inesperado al cancelar la reserva.';
+                    if (error.message) {
+                        errorMessage = error.message;
+                    }
+                    showAlert('danger', `Error en la solicitud: ${errorMessage}`);
+                });
+            });
+
+            // Función de ayuda para mostrar alertas de Bootstrap
+            function showAlert(type, message) {
+                const alertContainer = document.querySelector('.container'); // Contenedor de alertas en tu base.html
+                if (!alertContainer) { // Si no existe el contenedor, lo creamos temporalmente en body
+                    console.warn("No se encontró un '.container' para las alertas. Creando un contenedor temporal.");
+                    const mainContent = document.querySelector('main');
+                    if (mainContent) {
+                        alertContainer = document.createElement('div');
+                        alertContainer.classList.add('container', 'mt-4');
+                        mainContent.prepend(alertContainer);
+                    } else {
+                        console.error("No se pudo encontrar ni crear un contenedor para las alertas.");
+                        return; // Salir si no hay dónde mostrar la alerta
+                    }
+                }
+
+                const alertDiv = document.createElement('div');
+                alertDiv.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                alertContainer.prepend(alertDiv); // Añade la alerta al principio del contenedor
+
+                // Opcional: Para asegurar que se pueda cerrar programáticamente si es necesario
+                new bootstrap.Alert(alertDiv);
+            }
+        });
+    </script>
+{% endblock %}
