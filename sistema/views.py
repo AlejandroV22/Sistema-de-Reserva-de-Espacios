@@ -32,7 +32,7 @@ def agregar_espacio(request):
 def eliminar_espacio(request, espacio_id):
     espacio = get_object_or_404(Espacio, id=espacio_id)
     espacio.delete()
-    return ('panel_espacios')
+    return redirect ('admin_panel_espacios')
 
 def panel_administrador(request): #Panel de administrador personalizado
     return render(request, 'panel_administrador.html')
