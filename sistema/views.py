@@ -9,3 +9,6 @@ def login_view(request):
 
 def panel_usuario_view(request):
     return render(request, 'panel_usuario.html')
+
+def reservas_view(request):
+    return render(request, 'reservas.html')
