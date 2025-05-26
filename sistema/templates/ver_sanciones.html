@@ -1,32 +1,55 @@
-<h2>Listado de Sanciones</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Sanciones</title>
+</head>
+<body>
+    <h1>Lista de Sanciones</h1>
 
-<table>
-    <tr>
-        <th>Usuario</th>
-        <th>Motivo</th>
-        <th>Aplicación</th>
-        <th>Levantamiento</th>
-        <th>Estado</th>
-    </tr>
-    {% for sancion in sanciones %}
-    <tr>
-        <td>{{ sancion.usuario.username }}</td>
-        <td>{{ sancion.motivo }}</td>
-        <td>{{ sancion.fecha_aplicacion }}</td>
-        <td>
-            {% if sancion.fecha_levantamiento %}
-                {{ sancion.fecha_levantamiento }}
-            {% else %}
-                Indefinida
-            {% endif %}
-        </td>
-        <td>
-            {% if sancion.esta_activa %}
-                Activa
-            {% else %}
-                Inactiva
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Motivo</th>
+                <th>Fecha de Aplicación</th>
+                <th>Fecha de Levantamiento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sancion in sanciones %}
+            <tr>
+                <td>{{ sancion.usuario }}</td>
+                <td>{{ sancion.motivo }}</td>
+                <td>{{ sancion.fecha_aplicacion }}</td>
+                <td>
+                    {% if sancion.fecha_levantamiento %}
+                        {{ sancion.fecha_levantamiento }}
+                    {% else %}
+                        Indefinida
+                    {% endif %}
+                </td>
+                <td>
+                    {% if sancion.esta_activa %}
+                        Activa
+                    {% else %}
+                        Inactiva
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'editar_sancion' sancion.id %}">✏️</a>
+                    <a href="{% url 'eliminar_sancion' sancion.id %}" onclick="return confirm('¿Estás seguro de eliminar esta sanción?')">🗑️</a>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <a href="{% url 'aplicar_sancion' %}">
+        <button>← Volver a aplicar sanción</button>
+    </a>
+</body>
+</html>

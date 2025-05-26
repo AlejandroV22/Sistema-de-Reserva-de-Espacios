@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Espacio, Usuario, Reserva , HorarioDisponible, Sancion
-from .forms import EspacioForm 
+from .forms import EspacioForm, SancionForm
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
@@ -408,3 +408,20 @@ def cancelar_reserva(request, reserva_id):
         import traceback
         traceback.print_exc()
         return JsonResponse({'success': False, 'message': f'Error al cancelar la reserva: {str(e)}'}, status=500)
+
+def editar_sancion(request, sancion_id):
+    sancion = get_object_or_404(Sancion, id=sancion_id)
+    if request.method == 'POST':
+        form = SancionForm(request.POST, instance=sancion)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_sanciones')
+    else:
+        form = SancionForm(instance=sancion)
+    return render(request, 'editar_sancion.html', {'form': form, 'sancion': sancion})
+
+
+def eliminar_sancion(request, sancion_id):
+    sancion = get_object_or_404(Sancion, id=sancion_id)
+    sancion.delete()
+    return redirect('ver_sanciones')
