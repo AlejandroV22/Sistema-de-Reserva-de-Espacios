@@ -16,27 +16,25 @@ from django.contrib import messages
 from .forms import SancionForm
 # Create your views here.
 
-
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username') 
-        password = request.POST.get('password') 
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        usuario = authenticate(request, username=username, password=password)
 
-        
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-          
-            login(request, user)
-            
-            return redirect(settings.LOGIN_REDIRECT_URL) 
+        if usuario is not None:
+            if usuario.is_active:  
+                login(request, usuario)
+                if usuario.rol == 'admin':
+                    return redirect('panel_administrador')
+                else:
+                    return redirect('panel_usuario')
+            else:
+                return render(request, 'login.html', {'error': 'Usuario inactivo'})
         else:
-        
-            error_message = "Nombre de usuario o contraseña incorrectos."
-            return render(request, 'login.html', {'error_message': error_message})
-    else:
-       
-        return render(request, 'login.html')
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+    return render(request, 'login.html')
+
 
 @login_required # <--- solo usuarios autenticados pueden acceder
 def panel_usuario_view(request):

@@ -18,7 +18,7 @@
 
             <form method="post" class="w-100">
                 {% csrf_token %} {# ¡MUY IMPORTANTE! Token de seguridad de Django #}
-
+                
                 {# Mostrar errores no relacionados con campos específicos #}
                 {% if form.non_field_errors %}
                     <div class="alert alert-danger" role="alert">
@@ -53,6 +53,11 @@
                     {% endif %}
                 </div>
                 <div class="d-grid gap-2">
+                    {% if error %}
+                    <div class="alert alert-danger mt-3">
+                     {{ error }}
+                    </div>
+                    {% endif %}   
                     <button type="submit" class="btn btn-custom-primary text-white py-2">
                         Inicio Sesión
                     </button>
