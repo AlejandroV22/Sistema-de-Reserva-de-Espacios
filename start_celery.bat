@@ -1,0 +1,2 @@
+start cmd /k "cd C:\Users\LENOVO\Desktop\TeamWare Project\teamware_project && env\Scripts\activate && celery -A teamware_project worker --loglevel=info"
+start cmd /k "cd C:\Users\LENOVO\Desktop\TeamWare Project\teamware_project && env\Scripts\activate && celery -A teamware_project beat --loglevel=info"

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,6 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'teamwareproject@gmail.com'
+EMAIL_HOST_PASSWORD = 'teamware1234'  # Usa variables de entorno en producción
+
 
 # Application definition
 AUTH_USER_MODEL = 'sistema.Usuario'
@@ -40,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'sistema',
     'django_extensions',
-   
+    'django_celery_beat',
+
 ]
 
 
@@ -139,3 +148,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/' 
 LOGIN_REDIRECT_URL = '/panel-usuario/' 
 #LOGOUT_REDIRECT_URL = '/'
+
+CELERY_BEAT_SCHEDULE = {
+    'enviar_notificaciones_diarias': {
+        'task': 'sistema.tasks.tarea_enviar_notificaciones',
+        'schedule': crontab(hour=8, minute=0),  # Se ejecutará todos los días a las 8 AM
+    },
+}
+
+CELERY_TIMEZONE = 'America/Bogota'  # Ajusta según tu zona horaria

@@ -14,6 +14,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 from .forms import SancionForm
+from django.core.mail import send_mail
+from django.utils import timezone
 # Create your views here.
 
 def login_view(request):
@@ -430,3 +432,17 @@ def eliminar_sancion(request, sancion_id):
     sancion = get_object_or_404(Sancion, id=sancion_id)
     sancion.delete()
     return redirect('ver_sanciones')
+
+
+
+def enviar_notificaciones():
+    reservas = Reserva.objects.filter(fecha_Reserva=timezone.now().date())  # Obtiene reservas del día
+    for reserva in reservas:
+        mensaje = f"Hola {reserva.usuario.username}, recuerda que tienes una reserva hoy en {reserva.espacio.nombre} de {reserva.horaInicio} a {reserva.horaFin}."
+        send_mail(
+            'Recordatorio de Reserva',
+            mensaje,
+            'teamwareproject@gmail.com',  # Remitente
+            [reserva.usuario.email],  # Destinatario
+            fail_silently=False,
+        )
