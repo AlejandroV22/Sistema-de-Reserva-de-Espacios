@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Espacio, Usuario, Reserva , HorarioDisponible, Sancion
-from .forms import EspacioForm 
+from .forms import EspacioForm, SancionForm
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
@@ -16,27 +16,25 @@ from django.contrib import messages
 from .forms import SancionForm
 # Create your views here.
 
-
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username') 
-        password = request.POST.get('password') 
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        usuario = authenticate(request, username=username, password=password)
 
-        
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-          
-            login(request, user)
-            
-            return redirect(settings.LOGIN_REDIRECT_URL) 
+        if usuario is not None:
+            if usuario.is_active:  
+                login(request, usuario)
+                if usuario.rol == 'admin':
+                    return redirect('panel_administrador')
+                else:
+                    return redirect('panel_usuario')
+            else:
+                return render(request, 'login.html', {'error': 'Usuario inactivo'})
         else:
-        
-            error_message = "Nombre de usuario o contraseña incorrectos."
-            return render(request, 'login.html', {'error_message': error_message})
-    else:
-       
-        return render(request, 'login.html')
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+    return render(request, 'login.html')
+
 
 @login_required # <--- solo usuarios autenticados pueden acceder
 def panel_usuario_view(request):
@@ -408,3 +406,20 @@ def cancelar_reserva(request, reserva_id):
         import traceback
         traceback.print_exc()
         return JsonResponse({'success': False, 'message': f'Error al cancelar la reserva: {str(e)}'}, status=500)
+
+def editar_sancion(request, sancion_id):
+    sancion = get_object_or_404(Sancion, id=sancion_id)
+    if request.method == 'POST':
+        form = SancionForm(request.POST, instance=sancion)
+        if form.is_valid():
+            form.save()
+            return redirect('ver_sanciones')
+    else:
+        form = SancionForm(instance=sancion)
+    return render(request, 'editar_sancion.html', {'form': form, 'sancion': sancion})
+
+
+def eliminar_sancion(request, sancion_id):
+    sancion = get_object_or_404(Sancion, id=sancion_id)
+    sancion.delete()
+    return redirect('ver_sanciones')

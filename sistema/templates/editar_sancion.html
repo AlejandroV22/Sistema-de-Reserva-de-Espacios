@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Sanción</title>
+</head>
+<body>
+    <h1>Editar Sanción</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <br>
+    <a href="{% url 'ver_sanciones' %}"><button>← Volver a la lista</button></a>
+</body>
+</html>
