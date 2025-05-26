@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 #MODELO DE USUARIO
-class Usuario(AbstractUser):
+class Usuario(AbstractUser): #Usuario: TeamWare Contraseña: alejo123
     ROL_CHOICES = [
         ('admin', 'Administrador'),
         ('usuario', 'Usuario'),
