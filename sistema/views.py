@@ -236,6 +236,13 @@ def mis_reservas(request):
    
 
 def confirmar_reserva(request):
+    usuario = request.user
+
+    if usuario.tiene_sancion_activa():
+        print("Usuario sancionado. Redirigiendo a error.html")  # DEBUG
+
+        return JsonResponse({'success': False, 'message': 'No puedes hacer reservas mientras tengas una sanción activa.'}, status=403)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)

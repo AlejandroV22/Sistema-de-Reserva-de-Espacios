@@ -12,6 +12,8 @@ class Usuario(AbstractUser):
     ]
 
     rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='usuario')
+    def tiene_sancion_activa(self):
+        return any(sancion.esta_activa for sancion in self.sanciones.all())
 
     def __str__(self):
         return f"{self.username} ({self.get_rol_display()})"
@@ -108,7 +110,6 @@ class Sancion(models.Model):
     def __str__(self):
         duracion = "indefinida" if self.fecha_levantamiento is None else (self.fecha_levantamiento - self.fecha_aplicacion).days
         return f"Sanción de {self.usuario} por {self.motivo} ({duracion} días)"
-
     @property
     def esta_activa(self):
         if self.fecha_levantamiento is None:
