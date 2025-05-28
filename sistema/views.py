@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Espacio, Usuario, Reserva , HorarioDisponible, Sancion
-from .forms import EspacioForm, SancionForm
+from .forms import EspacioForm, SancionForm, HorarioDisponibleForm
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 import json
@@ -17,6 +17,7 @@ from .forms import SancionForm
 from django.core.mail import send_mail
 from django.utils import timezone
 from sistema.tasks import enviar_correo_confirmacion
+from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 
@@ -55,15 +56,35 @@ def panel_espacios(request):
     espacios = Espacio.objects.all()
     return render(request, 'panel_espacios.html', {'espacios': espacios})
 
+
+
+
+
 def agregar_espacio(request):
-    if request.method == 'POST':
-        form = EspacioForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('panel_espacios')
-    else:
-        form = EspacioForm()
-    return render(request, 'agregar_espacio.html', {'form': form})
+    if request.method == "POST":
+        espacio_form = EspacioForm(request.POST)
+        horario_form = HorarioDisponibleForm(request.POST)
+
+        if espacio_form.is_valid():
+            nuevo_espacio = espacio_form.save()
+
+            # Validar si también se agregó un horario
+            if horario_form.is_valid():
+                nuevo_horario = horario_form.save(commit=False)
+                nuevo_horario.espacio = nuevo_espacio  # Relacionarlo con el nuevo espacio
+                nuevo_horario.save()
+
+            messages.success(request, f"Espacio '{nuevo_espacio.nombre}' creado con horario disponible.")
+        else:
+            messages.error(request, "Hubo un error al crear el espacio.")
+
+        return redirect("admin_panel_espacios")
+
+    espacio_form = EspacioForm()
+    horario_form = HorarioDisponibleForm()
+
+    # ✅ Cambio de plantilla: renderiza 'agregar_espacio.html' en lugar de 'admin_panel_espacios'
+    return render(request, "agregar_espacio.html", {"espacio_form": espacio_form, "horario_form": horario_form})
 
 def eliminar_espacio(request, espacio_id):
     espacio = get_object_or_404(Espacio, id=espacio_id)
@@ -98,68 +119,82 @@ def marcar_asistencia(request, reserva_id):
 def panel_usuarios(request): #Administracion de usuarios 
     return render(request, 'panel_usuarios.html')  
 
+
+
 def admin_panel_usuarios(request):
-    usuarios = Usuario.objects.all()
-
-    # Agregar usuario
-    if 'add_Usuario' in request.POST:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        rol = request.POST.get('rol')  # Obtener el rol (admin o usuario)
-        
-        if username and password:
-            if Usuario.objects.filter(username=username).exists():
-                messages.error(request, "El nombre de usuario ya está registrado. Por favor, elige otro.")
-                return redirect('admin_panel_usuarios')  # Cambio realizado aquí
-
-            usuario = Usuario.objects.create_user(username=username, email=email, password=password)
-            usuario.first_name = first_name
-            usuario.last_name = last_name
-            usuario.rol = rol  # Asignar el rol al usuario
-            usuario.save()
-            messages.success(request, f"{usuario.username} agregado correctamente.")
-        
-        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
-                
-    # Eliminar usuario
-    if 'delete_user' in request.POST:
-        usuario_id = request.POST.get('user_id')  # Obtener el id del usuario
-        if usuario_id:
-            try:
-                usuario = Usuario.objects.get(id=usuario_id)  # Buscar al usuario por id
-                usuario.delete()  # Eliminar usuario
-                messages.success(request, f"Usuario {usuario.username} eliminado correctamente.")
-            except Usuario.DoesNotExist:
-                messages.error(request, f"El usuario no existe.")
-            except Exception as e:
-                messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
-        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
+    usuarios = Usuario.objects.filter(rol="usuario")
     
-    # Cambiar contraseña
-    if "change_password" in request.POST:
-        usuario_id = request.POST.get("usuario_id")
-        new_password = request.POST.get("new_password")
-        confirm_password = request.POST.get("confirm_password")
+    # Agregar nuevo usuario
+    if "add_user" in request.POST:
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
 
-        if usuario_id and new_password and confirm_password:
-            if new_password == confirm_password:
-                try:
-                    usuario = Usuario.objects.get(id=usuario_id)
-                    usuario.set_password(new_password)
-                    usuario.save()
-                    messages.success(request, f"La contraseña para {usuario.username} ha sido cambiada exitosamente.")
-                except Usuario.DoesNotExist:
-                    messages.error(request, "El usuario no existe.")
+        if username and email and password:
+            if Usuario.objects.filter(username=username).exists():
+                messages.error(request, "El nombre de usuario ya está en uso.")
+            elif Usuario.objects.filter(email=email).exists():
+                messages.error(request, "El correo ya está registrado.")
             else:
-                messages.error(request, "Las contraseñas no coinciden.")
+                Usuario.objects.create(
+                    username=username,
+                    email=email,
+                    password=make_password(password),  # Se encripta la contraseña
+                    rol="usuario"  # Se crea como usuario normal
+                )
+                messages.success(request, f"Usuario {username} creado correctamente.")
         else:
             messages.error(request, "Todos los campos son obligatorios.")
-        
-        return redirect('admin_panel_usuarios')  # Cambio realizado aquí
-    
+
+        return redirect("admin_panel_usuarios")
+
+    # Eliminar usuario
+    if 'delete_user' in request.POST:
+        usuario_id = request.POST.get('user_id')
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)
+                usuario.delete()
+                messages.success(request, f"Usuario {usuario.username} eliminado correctamente.")
+            except Usuario.DoesNotExist:
+                messages.error(request, "El usuario no existe.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al eliminar el usuario: {str(e)}")
+        return redirect('admin_panel_usuarios')
+
+    # Editar usuario (correo y contraseña, con validación de rol)
+    if "edit_user" in request.POST:
+        usuario_id = request.POST.get("usuario_id")
+        new_email = request.POST.get("new_email")
+        new_password = request.POST.get("new_password")
+
+        if usuario_id:
+            try:
+                usuario = Usuario.objects.get(id=usuario_id)
+                
+                # Verificar si el usuario es admin o usuario
+                if usuario.rol == "admin":
+                    # Solo permite cambiar la contraseña
+                    if new_password:
+                        usuario.set_password(new_password)
+                    else:
+                        messages.error(request, "No puedes editar el correo de un administrador.")
+                else:
+                    # Permitir cambios en correo y contraseña
+                    if new_email and new_email != usuario.email:
+                        usuario.email = new_email
+                    if new_password:
+                        usuario.set_password(new_password)
+                    
+                usuario.save()
+                messages.success(request, f"Usuario {usuario.username} actualizado correctamente.")
+            except Usuario.DoesNotExist:
+                messages.error(request, "El usuario no existe.")
+        else:
+            messages.error(request, "Faltan datos para la actualización.")
+
+        return redirect('admin_panel_usuarios')
+
     return render(request, 'admin_panel_usuarios.html', {'usuarios': usuarios})
 
 ####

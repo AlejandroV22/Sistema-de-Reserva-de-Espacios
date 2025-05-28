@@ -1,8 +1,12 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from sistema.views import agregar_espacio
+
+
 from . import views 
 
 urlpatterns = [
+    #URLS DE DJANGO, TEMPORALMENTE COMENTADAS
     path('', views.login_view, name='root'),
     path('login/', views.login_view, name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'), 
@@ -30,6 +34,9 @@ urlpatterns = [
     path('admin-panel/sanciones/ver/', views.ver_sanciones, name='ver_sanciones'),
     path('admin-panel/sanciones/editar/<int:sancion_id>/', views.editar_sancion, name='editar_sancion'),
     path('admin-panel/sanciones/eliminar/<int:sancion_id>/', views.eliminar_sancion, name='eliminar_sancion'),
+    path('admin-panel/espacios/agregar_espacio/', agregar_espacio, name='agregar_espacio'),
+
+
 
 
 ]

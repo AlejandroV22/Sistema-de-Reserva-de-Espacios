@@ -34,10 +34,12 @@
                     <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
                     <td>{{ usuario.get_rol_display }}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                data-bs-target="#changePasswordModal{{ usuario.id }}">
-                            Cambiar Contraseña
-                        </button>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#editUserModal{{ usuario.id }}">
+                                Editar Usuario
+                            </button>
+                        </td>
                     </td>
                 </tr>
                 {% endfor %}
@@ -53,7 +55,86 @@
 
     <!-- Modales de Cambio de Contraseña -->
     <!-- ... -->
+<!-- Botón para abrir el modal de agregar usuario -->
+<button class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#addUserModal">
+    + Agregar Usuario
+</button>
 
+
+ {% for usuario in usuarios %}
+<div class="modal fade" id="editUserModal{{ usuario.id }}" tabindex="-1" aria-labelledby="editUserLabel{{ usuario.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="margin: 60px auto;"> <!-- Más margen superior e inferior -->
+        <div class="modal-content p-4"> <!-- Aumenta el padding interno -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="usuario_id" value="{{ usuario.id }}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="editUserLabel{{ usuario.id }}">Editar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-4"> <!-- Mayor margen inferior -->
+                        <label for="email{{ usuario.id }}" class="form-label fw-bold">Correo Electrónico</label>
+                        <input type="email" class="form-control" name="new_email" value="{{ usuario.email }}" required>
+                    </div>
+
+                    <div class="mb-4"> <!-- Mayor margen inferior -->
+                        <label for="password{{ usuario.id }}" class="form-label fw-bold">Nueva Contraseña (Opcional)</label>
+                        <input type="password" class="form-control" name="new_password">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" name="edit_user" class="btn btn-success px-4">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para agregar usuario -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="margin: 60px auto;">
+        <div class="modal-content p-4">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addUserLabel">Agregar Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label for="username" class="form-label fw-bold">Nombre de Usuario</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-bold">Contraseña</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" name="add_user" class="btn btn-success px-4">Crear Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endfor %}
     <div class="mt-4 text-end">
         <a href="{% url 'panel_administrador' %}" class="btn btn-outline-primary">
             ← Volver al Panel Principal

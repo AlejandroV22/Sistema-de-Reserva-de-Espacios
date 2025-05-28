@@ -1,11 +1,16 @@
 from django import forms
-from .models import Sancion, Usuario, Reserva, Espacio
+from .models import Sancion, Reserva, Espacio, HorarioDisponible
 
 
 class EspacioForm(forms.ModelForm):
     class Meta:
         model = Espacio
         fields = ['nombre', 'tipoEspacio', 'capacidadMaxima']
+
+class HorarioDisponibleForm(forms.ModelForm):
+    class Meta:
+        model = HorarioDisponible
+        fields = ['dia_semana', 'hora_inicio', 'hora_fin']
 
 class ReservaForm(forms.ModelForm):
    
