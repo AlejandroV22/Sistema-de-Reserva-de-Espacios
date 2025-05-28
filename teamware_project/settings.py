@@ -33,7 +33,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'teamwareproject@gmail.com'
-EMAIL_HOST_PASSWORD = 'teamware1234'  # Usa variables de entorno en producción
+EMAIL_HOST_PASSWORD = 'tutz zaal lofr bfwr'  # Usa variables de entorno en producción
 
 
 # Application definition

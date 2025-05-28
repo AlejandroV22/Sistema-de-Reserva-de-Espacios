@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from sistema.tasks import enviar_correo_confirmacion
 
 
 
@@ -82,7 +83,20 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"Reserva de {self.usuario} en {self.espacio} para el {self.fecha_Reserva} de {self.horaInicio} a {self.horaFin}"
-    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        detalles_reserva = f"Fecha: {self.fecha_Reserva}, Espacio: {self.espacio}, Hora Inicio: {self.horaInicio}, Hora Fin: {self.horaFin}"
+        
+        enviar_correo_confirmacion.delay(
+            self.usuario.email,
+            self.usuario.username,  
+            self.espacio.nombre,  
+            self.fecha_Reserva,
+            self.horaInicio,
+            self.horaFin
+        )
+
 #MODELO DE NOTIFICACIONES
 
 class Notificacion(models.Model):

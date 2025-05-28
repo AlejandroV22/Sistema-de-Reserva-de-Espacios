@@ -16,6 +16,8 @@ from django.contrib import messages
 from .forms import SancionForm
 from django.core.mail import send_mail
 from django.utils import timezone
+from sistema.tasks import enviar_correo_confirmacion
+
 # Create your views here.
 
 def login_view(request):
@@ -241,38 +243,27 @@ def confirmar_reserva(request):
     usuario = request.user
 
     if usuario.tiene_sancion_activa():
-        print("Usuario sancionado. Redirigiendo a error.html")  # DEBUG
-
         return JsonResponse({'success': False, 'message': 'No puedes hacer reservas mientras tengas una sanción activa.'}, status=403)
 
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print(f"Datos recibidos para confirmar_reserva: {data}") # DEBUG: Imprime los datos recibidos
-
             espacio_id = data.get('espacio_id')
             fecha_str = data.get('fecha_Reserva')
             hora_inicio_str = data.get('horaInicio')
             hora_fin_str = data.get('horaFin')
 
-            # DEBUG: Verifica si los datos se obtuvieron correctamente del JSON
-            print(f"espacio_id: {espacio_id}, fecha_str: {fecha_str}, hora_inicio_str: {hora_inicio_str}, hora_fin_str: {hora_fin_str}")
-
-
             if not (espacio_id and fecha_str and hora_inicio_str and hora_fin_str):
-                # Este error debería ser capturado por tu JS y mostrar un alert
                 return JsonResponse({'success': False, 'message': 'Datos incompletos para la reserva.'}, status=400)
 
             fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
             hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
             hora_fin = datetime.strptime(hora_fin_str, '%H:%M').time()
 
-            # DEBUG: Imprime los objetos datetime
-            print(f"Fecha parseada: {fecha}, Hora inicio parseada: {hora_inicio}, Hora fin parseada: {hora_fin}")
-
-
             espacio = Espacio.objects.get(id=espacio_id)
-            print(f"Espacio obtenido: {espacio.nombre}") # DEBUG: Confirma que el espacio se encontró
+            espacio = Espacio.objects.filter(id=espacio_id).first()
+            if espacio is None:
+                return JsonResponse({'success': False, 'message': 'El espacio seleccionado no existe.'}, status=404)
 
             # Validar que el horario solicitado esté dentro de un horario disponible para ese día de la semana
             dia_semana = fecha.weekday()
@@ -282,9 +273,6 @@ def confirmar_reserva(request):
                 hora_inicio__lte=hora_inicio,
                 hora_fin__gte=hora_fin
             )
-
-            # DEBUG: Confirma si hay horarios disponibles que cubran el rango
-            print(f"Horarios disponibles para el día y espacio: {horarios_disponibles.exists()}")
 
             if not horarios_disponibles.exists():
                 return JsonResponse({'success': False, 'message': 'El horario seleccionado no está disponible en la franja general.'}, status=400)
@@ -297,38 +285,41 @@ def confirmar_reserva(request):
                 Q(horaInicio__lt=hora_fin) & Q(horaFin__gt=hora_inicio)
             )
 
-            # DEBUG: Confirma si hay conflictos
-            print(f"Conflictos existentes: {conflictos.exists()}")
             if conflictos.exists():
                 print(f"Conflictos encontrados: {list(conflictos)}") # Imprime los conflictos
                 return JsonResponse({'success': False, 'message': 'El horario seleccionado ya está reservado.'}, status=409)
-
-            # Crear reserva
-            # DEBUG: Imprime los valores antes de crear la reserva
-            print(f"Creando reserva para usuario: {request.user.id if request.user.is_authenticated else 'Anónimo'}, "
-                  f"Espacio: {espacio.nombre}, Fecha: {fecha}, Inicio: {hora_inicio}, Fin: {hora_fin}")
-
+            print(f"Espacio obtenido: {espacio}")
+            print(f"Espacio ID recibido: {espacio_id}")
+            print(f"Tipo de espacio: {type(espacio)}, Valor de espacio: {espacio}")
             Reserva.objects.create(
-                usuario=request.user if request.user.is_authenticated else None, # Asegúrate de que request.user exista y sea un objeto Usuario
+                usuario=request.user if request.user.is_authenticated else None, 
                 espacio=espacio,
                 fecha_Reserva=fecha,
                 horaInicio=hora_inicio,
                 horaFin=hora_fin,
             )
+            #DEBUG
+            print(f"Email: {request.user.email}, Usuario: {request.user.username}, Espacio: {espacio.nombre}, Fecha: {fecha}, Hora Inicio: {hora_inicio}, Hora Fin: {hora_fin}")  
+            enviar_correo_confirmacion.apply_async(args=[
+                request.user.email,
+                request.user.username,
+                espacio.nombre,
+                fecha,
+                hora_inicio,
+                hora_fin
+            ])
+
 
             return JsonResponse({'success': True, 'message': 'Reserva confirmada exitosamente.'})
 
         except Espacio.DoesNotExist:
-            print("ERROR: Espacio no encontrado.") # DEBUG
             return JsonResponse({'success': False, 'message': 'Espacio no encontrado.'}, status=404)
         except ValueError as ve:
-            print(f"ERROR: Formato de fecha u hora inválido. {ve}") # DEBUG
             return JsonResponse({'success': False, 'message': f'Formato de fecha u hora inválido: {ve}'}, status=400)
         except Exception as e:
             # Esto debería forzar la impresión del traceback
             import traceback
             traceback.print_exc()
-            print(f"ERROR: Error inesperado en confirmar_reserva: {e}") # DEBUG
             return JsonResponse({'success': False, 'message': f'Error inesperado del servidor: {str(e)}'}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
